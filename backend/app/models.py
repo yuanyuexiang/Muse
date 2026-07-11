@@ -49,7 +49,7 @@ class InboxMessage(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     msgid: Mapped[str] = mapped_column(String(128), unique=True, index=True)  # 去重
-    seq: Mapped[int] = mapped_column(Integer, default=0)  # 保序（逐条转发丢失原始时间戳）
+    seq: Mapped[int] = mapped_column(BigInteger, default=0)  # 保序：用接收时刻(epoch ms)，需 BigInteger
     channel: Mapped[str] = mapped_column(String(32))       # wecom_bot | wecom_archive | ...
     forwarded_by: Mapped[str | None] = mapped_column(String(128), nullable=True)  # 转发的客服
 
