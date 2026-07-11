@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: muse
+      POSTGRES_PASSWORD: muse
+      POSTGRES_DB: muse
+    ports:
+      # 宿主 5432 常被本机已有 Postgres 占用，映射到 55432；容器间仍走内部 postgres:5432
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U muse"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # 媒体对象存储。Phase 1 也可用本地卷（STORAGE_BACKEND=local），此服务保留供切换。
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: muse
+      MINIO_ROOT_PASSWORD: muse12345
+    ports:
+      - "19000:9000"   # S3 API（宿主 9000 常被占用）
+      - "19001:9001"   # 控制台
+    volumes:
+      - miniodata:/data
+
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      # 容器内连服务名，覆盖 .env 里的 localhost
+      DATABASE_URL: postgresql+asyncpg://muse:muse@postgres:5432/muse
+      MINIO_ENDPOINT: minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      # 宿主 8000 常被占用，映射到 18000；前端反代目标同步为 18000
+      - "18000:8000"
+    volumes:
+      # 与 bot 共享媒体存储（STORAGE_BACKEND=local 时，两个容器需看到同一份文件）
+      - mediadata:/app/data
+
+  # 企业微信机器人长连接（常驻进程，独立于 API；一个机器人同一时刻仅一条连接）
+  bot:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://muse:muse@postgres:5432/muse
+      MINIO_ENDPOINT: minio:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python -m app.worker
+    restart: unless-stopped
+    volumes:
+      - mediadata:/app/data
+
+volumes:
+  pgdata:
+  miniodata:
+  mediadata:

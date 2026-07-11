@@ -1,0 +1,30 @@
+# Secrets / env
+.env
+.env.local
+*.pem
+# 下载的凭证文件（如阿里云 apiKey CSV）
+*apiKey*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Data / storage (local media dev)
+data/
+backend/data/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+frontend/.env*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
