@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db import init_db
-from app.routers import batches, customers, dev, inbox, media, requirements, templates
+from app.routers import batches, customers, dev, inbox, media, requirements, stats, templates
 
 
 @asynccontextmanager
@@ -30,6 +30,7 @@ app.include_router(customers.router, prefix=API_PREFIX)
 app.include_router(batches.router, prefix=API_PREFIX)
 app.include_router(requirements.router, prefix=API_PREFIX)
 app.include_router(templates.router, prefix=API_PREFIX)
+app.include_router(stats.router, prefix=API_PREFIX)
 app.include_router(dev.router, prefix=API_PREFIX)
 
 

@@ -1,6 +1,7 @@
 import "./globals.css";
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import AppShell from "@/components/AppShell";
 
 export const metadata = { title: "MUSE 后台" };
 
@@ -8,16 +9,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh">
       <body>
-        <header className="topbar">
-          <Link href="/" className="brand">
-            MUSE
-          </Link>
-          <nav>
-            <Link href="/inbox">待整理收件箱</Link>
-            <Link href="/batches">菜单批次</Link>
-          </nav>
-        </header>
-        <main className="container">{children}</main>
+        <AntdRegistry>
+          <AppShell>{children}</AppShell>
+        </AntdRegistry>
       </body>
     </html>
   );

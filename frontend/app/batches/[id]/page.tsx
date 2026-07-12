@@ -1,30 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Input,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Tag,
+  message,
+} from "antd";
 import { api } from "@/lib/api";
 import type { Batch, Dish, MenuRequirement, MenuSpec, ShopInfo } from "@/lib/types";
 
-const FLAGS: [string, string][] = [
-  ["hot", "辣"],
-  ["vegetarian", "素"],
-  ["nut", "坚"],
+const FLAG_OPTS = [
+  { label: "辣", value: "hot" },
+  { label: "素", value: "vegetarian" },
+  { label: "坚", value: "nut" },
 ];
-
 const lines = (a: string[]) => (a || []).join("\n");
 const toLines = (s: string) => s.split("\n");
-
 const emptyDish = (): Dish => ({
   number: null, name: "", description: null, price: null, flags: [], photo_object_key: null,
 });
+const SCALE = 0.52;
+const FW = 820;
 
-export default function BatchPage({ params }: { params: { id: string } }) {
+export default function BatchEditor({ params }: { params: { id: string } }) {
   const batchId = params.id;
   const [batch, setBatch] = useState<Batch | null>(null);
   const [req, setReq] = useState<MenuRequirement | null>(null);
   const [form, setForm] = useState<MenuSpec | null>(null);
-  const [msg, setMsg] = useState("");
-  const [err, setErr] = useState("");
   const [templates, setTemplates] = useState<{ key: string; label: string; desc: string }[]>([]);
+  const [ts, setTs] = useState(0);
+  const firstForm = useRef(true);
 
   useEffect(() => {
     let stop = false;
@@ -38,11 +51,10 @@ export default function BatchPage({ params }: { params: { id: string } }) {
         if (r) {
           setReq(r);
           setForm((prev) => prev ?? r.data);
-        } else if (tries++ < 12) {
-          setTimeout(poll, 1500);
-        }
+          setTs((t) => t || Date.now());
+        } else if (tries++ < 12) setTimeout(poll, 1500);
       } catch (e) {
-        if (!stop) setErr(String(e instanceof Error ? e.message : e));
+        if (!stop) message.error(String(e instanceof Error ? e.message : e));
       }
     }
     poll();
@@ -52,268 +64,233 @@ export default function BatchPage({ params }: { params: { id: string } }) {
   }, [batchId]);
 
   useEffect(() => {
-    api<{ key: string; label: string; desc: string }[]>("/templates")
-      .then(setTemplates)
-      .catch(() => {});
+    api<{ key: string; label: string; desc: string }[]>("/templates").then(setTemplates).catch(() => {});
   }, []);
 
-  // ── 不可变更新辅助 ──
-  const updShop = (patch: Partial<ShopInfo>) =>
-    setForm((f) => (f ? { ...f, shop: { ...f.shop, ...patch } } : f));
-  const updCat = (ci: number, name: string) =>
-    setForm((f) =>
-      f ? { ...f, categories: f.categories.map((c, i) => (i === ci ? { ...c, name } : c)) } : f
-    );
-  const addCat = () =>
-    setForm((f) => (f ? { ...f, categories: [...f.categories, { name: "新分类", dishes: [] }] } : f));
-  const delCat = (ci: number) =>
-    setForm((f) => (f ? { ...f, categories: f.categories.filter((_, i) => i !== ci) } : f));
-  const updDish = (ci: number, di: number, patch: Partial<Dish>) =>
-    setForm((f) =>
-      f
-        ? {
-            ...f,
-            categories: f.categories.map((c, i) =>
-              i === ci ? { ...c, dishes: c.dishes.map((d, j) => (j === di ? { ...d, ...patch } : d)) } : c
-            ),
-          }
-        : f
-    );
-  const addDish = (ci: number) =>
-    setForm((f) =>
-      f
-        ? {
-            ...f,
-            categories: f.categories.map((c, i) =>
-              i === ci ? { ...c, dishes: [...c.dishes, emptyDish()] } : c
-            ),
-          }
-        : f
-    );
-  const delDish = (ci: number, di: number) =>
-    setForm((f) =>
-      f
-        ? {
-            ...f,
-            categories: f.categories.map((c, i) =>
-              i === ci ? { ...c, dishes: c.dishes.filter((_, j) => j !== di) } : c
-            ),
-          }
-        : f
-    );
-  const toggleFlag = (ci: number, di: number, flag: string) =>
-    setForm((f) =>
-      f
-        ? {
-            ...f,
-            categories: f.categories.map((c, i) =>
-              i === ci
-                ? {
-                    ...c,
-                    dishes: c.dishes.map((d, j) =>
-                      j === di
-                        ? {
-                            ...d,
-                            flags: d.flags.includes(flag)
-                              ? d.flags.filter((x) => x !== flag)
-                              : [...d.flags, flag],
-                          }
-                        : d
-                    ),
-                  }
-                : c
-            ),
-          }
-        : f
-    );
+  const approved = req?.status === "approved";
+
+  // 去抖自动保存 → 刷新右侧预览
+  useEffect(() => {
+    if (!form || !req || approved) return;
+    if (firstForm.current) {
+      firstForm.current = false;
+      return;
+    }
+    const t = setTimeout(() => {
+      save();
+    }, 800);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
 
   async function save(): Promise<boolean> {
-    if (!req || !form) return false;
+    if (!req || !form || approved) return false;
     try {
       const r = await api<MenuRequirement>(`/requirements/${req.id}`, {
         method: "PATCH",
         body: JSON.stringify({ data: form }),
       });
       setReq(r);
-      setForm(r.data);
-      setMsg("已保存");
+      setTs(Date.now());
       return true;
     } catch (e) {
-      setErr(String(e instanceof Error ? e.message : e));
+      message.error(String(e instanceof Error ? e.message : e));
       return false;
     }
   }
-
-  function saveThenOpen(path: string) {
-    // 在点击手势内**同步**开一个空白标签，避开弹窗拦截；填地址前尽量先保存。
-    const url = window.location.origin + path;
-    const w = window.open("about:blank", "_blank");
-    const go = () => {
-      if (w) w.location.href = url;
-      else window.location.href = url; // 万一被拦截，退化为当前页跳转
-    };
-    // 已入库无需保存；未入库先保存再预览（即便保存失败也展示已存版本，不吞掉预览）。
-    if (req?.status === "approved") go();
-    else save().finally(go);
+  async function saveManual() {
+    if (await save()) message.success("已保存");
   }
-
   async function approve() {
     if (!req) return;
-    if (!(await save())) return;
+    await save();
     try {
       const r = await api<MenuRequirement>(`/requirements/${req.id}/approve`, {
         method: "POST",
         body: JSON.stringify({ reviewed_by: "admin" }),
       });
       setReq(r);
-      setMsg("已入库 ✅");
+      message.success("已入库 ✅");
     } catch (e) {
-      setErr(String(e instanceof Error ? e.message : e));
+      message.error(String(e instanceof Error ? e.message : e));
     }
   }
+  function openMenu(ext: "html" | "pdf") {
+    if (!req || !form) return;
+    const url = `${window.location.origin}/api/requirements/${req.id}/menu.${ext}?theme=${form.theme}`;
+    const w = window.open("about:blank", "_blank");
+    const go = () => {
+      if (w) w.location.href = url;
+      else window.location.href = url;
+    };
+    approved ? go() : save().finally(go);
+  }
 
-  if (!batch) return <p>加载中…</p>;
-  const approved = req?.status === "approved";
-  const dishCount = form ? form.categories.reduce((n, c) => n + c.dishes.length, 0) : 0;
+  // ── 不可变更新 ──
+  const updShop = (p: Partial<ShopInfo>) => setForm((f) => (f ? { ...f, shop: { ...f.shop, ...p } } : f));
+  const updCat = (ci: number, name: string) =>
+    setForm((f) => (f ? { ...f, categories: f.categories.map((c, i) => (i === ci ? { ...c, name } : c)) } : f));
+  const addCat = () =>
+    setForm((f) => (f ? { ...f, categories: [...f.categories, { name: "新分类", dishes: [] }] } : f));
+  const delCat = (ci: number) =>
+    setForm((f) => (f ? { ...f, categories: f.categories.filter((_, i) => i !== ci) } : f));
+  const mapDish = (ci: number, fn: (ds: Dish[]) => Dish[]) =>
+    setForm((f) => (f ? { ...f, categories: f.categories.map((c, i) => (i === ci ? { ...c, dishes: fn(c.dishes) } : c)) } : f));
+  const updDish = (ci: number, di: number, p: Partial<Dish>) =>
+    mapDish(ci, (ds) => ds.map((d, j) => (j === di ? { ...d, ...p } : d)));
+  const addDish = (ci: number) => mapDish(ci, (ds) => [...ds, emptyDish()]);
+  const delDish = (ci: number, di: number) => mapDish(ci, (ds) => ds.filter((_, j) => j !== di));
+  const mapSM = (fn: (s: MenuSpec["set_meals"]) => MenuSpec["set_meals"]) =>
+    setForm((f) => (f ? { ...f, set_meals: fn(f.set_meals) } : f));
+
+  if (!batch) return <Spin style={{ margin: 40 }} />;
+  if (!req || !form) return <Spin tip="AI 整理中…" style={{ margin: 40 }} />;
+
   const images = batch.messages.filter((m) => m.type === "image" && m.object_key);
+  const dishCount = form.categories.reduce((n, c) => n + c.dishes.length, 0);
+  const previewUrl = `/api/requirements/${req.id}/menu.html?theme=${form.theme}&t=${ts}`;
 
   return (
-    <div>
-      <h1>批次 #{batch.id} · 菜单审校</h1>
-      <p className="muted">状态：{batch.status}　客户 ID：{batch.customer_id}</p>
-      {err && <p className="err">{err}</p>}
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 96px)" }}>
+      {/* 头部工具条 */}
+      <Space style={{ marginBottom: 10 }} wrap>
+        <Tag>批次 #{batch.id}</Tag>
+        <span style={{ color: "#888" }}>
+          {form.categories.length} 分类 · {dishCount} 菜 · {form.set_meals.length} 套餐
+        </span>
+        {approved ? <Tag color="green">已入库</Tag> : <Tag color="blue">草稿（自动保存）</Tag>}
+        <span style={{ flex: 1 }} />
+        <Button onClick={() => openMenu("html")}>新窗口预览</Button>
+        <Button onClick={() => openMenu("pdf")}>导出 PDF</Button>
+        <Button onClick={saveManual} disabled={approved}>保存</Button>
+        <Button type="primary" onClick={approve} disabled={approved}>审校通过入库</Button>
+      </Space>
 
-      {!req || !form ? (
-        <p className="muted">AI 整理中…（自动刷新）</p>
-      ) : (
-        <>
-          <div className="toolbar">
-            <span className="muted">{form.categories.length} 个分类 · {dishCount} 道菜 · {form.set_meals.length} 套餐</span>
-            <span className="spacer" />
-            <button onClick={() => saveThenOpen(`/api/requirements/${req.id}/menu.html?theme=${form.theme}`)}>预览网页</button>
-            <button onClick={() => saveThenOpen(`/api/requirements/${req.id}/menu.pdf?theme=${form.theme}`)}>预览 PDF</button>
-            <button onClick={save} disabled={approved}>保存</button>
-            <button className="primary" onClick={approve} disabled={approved}>审校通过入库</button>
-            <span className="ok">{approved ? "已入库" : ""} {msg}</span>
-          </div>
-
+      <div style={{ display: "flex", gap: 12, flex: 1, minHeight: 0 }}>
+        {/* 中栏：编辑 */}
+        <div style={{ flex: 1, overflow: "auto", paddingRight: 4 }}>
+          {/* 模板选择 */}
           {templates.length > 0 && (
-            <div className="tmpl-picker">
-              <span className="tmpl-label">模板：</span>
-              {templates.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  className={`tmpl-card${form.theme === t.key ? " sel" : ""}`}
-                  onClick={() => setForm((f) => (f ? { ...f, theme: t.key } : f))}
-                  title={t.desc}
-                >
-                  <img src={`/templates/${t.key}.png`} alt={t.label} />
-                  <div className="tmpl-name">{t.label}</div>
-                  <div className="tmpl-desc">{t.desc}</div>
-                </button>
-              ))}
-            </div>
+            <Card size="small" title="模板" style={{ marginBottom: 10 }}>
+              <div className="tmpl-grid">
+                {templates.map((t) => (
+                  <div
+                    key={t.key}
+                    className={`tmpl-card${form.theme === t.key ? " sel" : ""}`}
+                    onClick={() => setForm((f) => (f ? { ...f, theme: t.key } : f))}
+                    title={t.desc}
+                  >
+                    <img src={`/templates/${t.key}.png`} alt={t.label} />
+                    <div className="tmpl-name">{t.label}</div>
+                    <div className="tmpl-desc">{t.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
           )}
 
           {form.missing_fields.length > 0 && (
-            <p className="warn">缺失/待确认：{form.missing_fields.join("、")}</p>
+            <div style={{ color: "#d46b08", marginBottom: 10 }}>缺失/待确认：{form.missing_fields.join("、")}</div>
           )}
 
           {/* 店铺信息 */}
-          <h3>店铺信息</h3>
-          <div className="shopgrid">
-            <label>店名<input value={form.shop.name ?? ""} onChange={(e) => updShop({ name: e.target.value })} /></label>
-            <label>标语<input value={form.shop.tagline ?? ""} onChange={(e) => updShop({ tagline: e.target.value })} /></label>
-            <label>电话<input value={form.shop.phone ?? ""} onChange={(e) => updShop({ phone: e.target.value })} /></label>
-            <label>网址<input value={form.shop.online_order_url ?? ""} onChange={(e) => updShop({ online_order_url: e.target.value })} /></label>
-            <label className="wide">地址<input value={form.shop.address ?? ""} onChange={(e) => updShop({ address: e.target.value })} /></label>
-            <label>营业时间（每行一条）<textarea value={lines(form.shop.opening_hours)} onChange={(e) => updShop({ opening_hours: toLines(e.target.value) })} /></label>
-            <label>促销（每行一条）<textarea value={lines(form.shop.promotions)} onChange={(e) => updShop({ promotions: toLines(e.target.value) })} /></label>
-            <label>外送条款（每行一条）<textarea value={lines(form.shop.delivery_terms)} onChange={(e) => updShop({ delivery_terms: toLines(e.target.value) })} /></label>
-            <label className="wide">过敏原/声明<textarea value={form.shop.allergen_notice ?? ""} onChange={(e) => updShop({ allergen_notice: e.target.value || null })} /></label>
-          </div>
+          <Card size="small" title="店铺信息" style={{ marginBottom: 10 }}>
+            <Row gutter={[8, 8]}>
+              <Col span={12}>
+                <Input addonBefore="店名" value={form.shop.name ?? ""} onChange={(e) => updShop({ name: e.target.value })} />
+              </Col>
+              <Col span={12}>
+                <Input addonBefore="标语" value={form.shop.tagline ?? ""} onChange={(e) => updShop({ tagline: e.target.value })} />
+              </Col>
+              <Col span={12}>
+                <Input addonBefore="电话" value={form.shop.phone ?? ""} onChange={(e) => updShop({ phone: e.target.value })} />
+              </Col>
+              <Col span={12}>
+                <Input addonBefore="网址" value={form.shop.online_order_url ?? ""} onChange={(e) => updShop({ online_order_url: e.target.value })} />
+              </Col>
+              <Col span={24}>
+                <Input addonBefore="地址" value={form.shop.address ?? ""} onChange={(e) => updShop({ address: e.target.value })} />
+              </Col>
+              <Col span={8}>
+                <Input.TextArea rows={2} placeholder="营业时间（每行一条）" value={lines(form.shop.opening_hours)} onChange={(e) => updShop({ opening_hours: toLines(e.target.value) })} />
+              </Col>
+              <Col span={8}>
+                <Input.TextArea rows={2} placeholder="促销（每行一条）" value={lines(form.shop.promotions)} onChange={(e) => updShop({ promotions: toLines(e.target.value) })} />
+              </Col>
+              <Col span={8}>
+                <Input.TextArea rows={2} placeholder="外送条款（每行一条）" value={lines(form.shop.delivery_terms)} onChange={(e) => updShop({ delivery_terms: toLines(e.target.value) })} />
+              </Col>
+              <Col span={24}>
+                <Input.TextArea rows={1} placeholder="过敏原/声明" value={form.shop.allergen_notice ?? ""} onChange={(e) => updShop({ allergen_notice: e.target.value || null })} />
+              </Col>
+            </Row>
+          </Card>
 
           {/* 分类与菜品 */}
-          <h3>分类与菜品</h3>
           {form.categories.map((cat, ci) => (
-            <div className="cat-block" key={ci}>
-              <div className="cat-head">
-                <input className="cat-name" value={cat.name} onChange={(e) => updCat(ci, e.target.value)} />
-                <span className="muted">{cat.dishes.length} 道</span>
-                <button onClick={() => delCat(ci)}>删除分类</button>
-              </div>
-              <table className="dish-table">
-                <thead>
-                  <tr><th>编号</th><th>菜名</th><th>价格</th><th>标记</th><th>描述</th><th>图片</th><th></th></tr>
-                </thead>
-                <tbody>
-                  {cat.dishes.map((d, di) => (
-                    <tr key={di}>
-                      <td><input className="w-num" value={d.number ?? ""} onChange={(e) => updDish(ci, di, { number: e.target.value || null })} /></td>
-                      <td><input className="w-name" value={d.name} onChange={(e) => updDish(ci, di, { name: e.target.value })} /></td>
-                      <td><input className="w-price" value={d.price ?? ""} onChange={(e) => updDish(ci, di, { price: e.target.value || null })} /></td>
-                      <td className="flags">
-                        {FLAGS.map(([f, label]) => (
-                          <label key={f} className="flagchk">
-                            <input type="checkbox" checked={d.flags.includes(f)} onChange={() => toggleFlag(ci, di, f)} />{label}
-                          </label>
-                        ))}
-                      </td>
-                      <td><input className="w-desc" value={d.description ?? ""} onChange={(e) => updDish(ci, di, { description: e.target.value || null })} /></td>
-                      <td className="photo-cell">
-                        <select
-                          value={d.photo_object_key ?? ""}
-                          onChange={(e) => updDish(ci, di, { photo_object_key: e.target.value || null })}
-                        >
-                          <option value="">无</option>
-                          {images.map((im) => (
-                            <option key={im.id} value={im.object_key as string}>
-                              {im.object_key!.split("/").pop()}
-                            </option>
-                          ))}
-                        </select>
-                        {d.photo_object_key && (
-                          <img
-                            className="thumb-mini"
-                            src={`/api/media/by-key?key=${encodeURIComponent(d.photo_object_key)}`}
-                            alt=""
-                          />
-                        )}
-                      </td>
-                      <td><button onClick={() => delDish(ci, di)}>×</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <button onClick={() => addDish(ci)}>+ 加菜</button>
-            </div>
+            <Card
+              key={ci}
+              size="small"
+              style={{ marginBottom: 10 }}
+              title={<Input value={cat.name} onChange={(e) => updCat(ci, e.target.value)} style={{ fontWeight: 700, maxWidth: 260 }} />}
+              extra={<Button danger size="small" onClick={() => delCat(ci)}>删除分类</Button>}
+            >
+              {cat.dishes.map((d, di) => (
+                <div key={di} style={{ display: "flex", gap: 6, marginBottom: 6, alignItems: "center", flexWrap: "wrap" }}>
+                  <Input style={{ width: 56 }} placeholder="编号" value={d.number ?? ""} onChange={(e) => updDish(ci, di, { number: e.target.value || null })} />
+                  <Input style={{ flex: "2 1 140px" }} placeholder="菜名" value={d.name} onChange={(e) => updDish(ci, di, { name: e.target.value })} />
+                  <Input style={{ width: 90 }} placeholder="价格" value={d.price ?? ""} onChange={(e) => updDish(ci, di, { price: e.target.value || null })} />
+                  <Checkbox.Group options={FLAG_OPTS} value={d.flags} onChange={(v) => updDish(ci, di, { flags: v as string[] })} />
+                  <Input style={{ flex: "2 1 120px" }} placeholder="描述" value={d.description ?? ""} onChange={(e) => updDish(ci, di, { description: e.target.value || null })} />
+                  <Select
+                    style={{ width: 120 }}
+                    value={d.photo_object_key ?? ""}
+                    onChange={(v) => updDish(ci, di, { photo_object_key: v || null })}
+                    options={[{ value: "", label: "无图" }, ...images.map((im) => ({ value: im.object_key as string, label: im.object_key!.split("/").pop() }))]}
+                  />
+                  <Button danger size="small" onClick={() => delDish(ci, di)}>×</Button>
+                </div>
+              ))}
+              <Button size="small" onClick={() => addDish(ci)}>+ 加菜</Button>
+            </Card>
           ))}
-          <button onClick={addCat}>+ 加分类</button>
+          <Space style={{ marginBottom: 10 }}>
+            <Button onClick={addCat}>+ 加分类</Button>
+          </Space>
 
           {/* 套餐 */}
-          <h3>套餐</h3>
-          {form.set_meals.map((sm, si) => (
-            <div className="setmeal-row" key={si}>
-              <input className="w-name" placeholder="套餐名" value={sm.name} onChange={(e) =>
-                setForm((f) => f ? { ...f, set_meals: f.set_meals.map((s, i) => i === si ? { ...s, name: e.target.value } : s) } : f)} />
-              <input className="w-price" placeholder="价格" value={sm.price ?? ""} onChange={(e) =>
-                setForm((f) => f ? { ...f, set_meals: f.set_meals.map((s, i) => i === si ? { ...s, price: e.target.value || null } : s) } : f)} />
-              <input className="w-desc" placeholder="包含（顿号/逗号分隔）" value={sm.items.join("、")} onChange={(e) =>
-                setForm((f) => f ? { ...f, set_meals: f.set_meals.map((s, i) => i === si ? { ...s, items: e.target.value.split(/[、,，]/).map((x) => x.trim()).filter(Boolean) } : s) } : f)} />
-              <button onClick={() => setForm((f) => f ? { ...f, set_meals: f.set_meals.filter((_, i) => i !== si) } : f)}>×</button>
-            </div>
-          ))}
-          <button onClick={() => setForm((f) => f ? { ...f, set_meals: [...f.set_meals, { name: "", price: null, items: [] }] } : f)}>+ 加套餐</button>
-
-          <h3>原始消息（{batch.messages.length}）</h3>
-          <ul className="msglist">
-            {batch.messages.map((m) => (
-              <li key={m.id}>[{m.seq}] {m.type === "text" ? m.content : `<${m.type}>`}</li>
+          <Card size="small" title="套餐" style={{ marginBottom: 10 }}>
+            {form.set_meals.map((sm, si) => (
+              <div key={si} style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+                <Input style={{ width: 140 }} placeholder="套餐名" value={sm.name} onChange={(e) => mapSM((s) => s.map((x, i) => (i === si ? { ...x, name: e.target.value } : x)))} />
+                <Input style={{ width: 90 }} placeholder="价格" value={sm.price ?? ""} onChange={(e) => mapSM((s) => s.map((x, i) => (i === si ? { ...x, price: e.target.value || null } : x)))} />
+                <Input style={{ flex: 1 }} placeholder="包含（顿号分隔）" value={sm.items.join("、")} onChange={(e) => mapSM((s) => s.map((x, i) => (i === si ? { ...x, items: e.target.value.split(/[、,，]/).map((y) => y.trim()).filter(Boolean) } : x)))} />
+                <Button danger size="small" onClick={() => mapSM((s) => s.filter((_, i) => i !== si))}>×</Button>
+              </div>
             ))}
-          </ul>
-        </>
-      )}
+            <Button size="small" onClick={() => mapSM((s) => [...s, { name: "", price: null, items: [] }])}>+ 加套餐</Button>
+          </Card>
+        </div>
+
+        {/* 右栏：实时预览 */}
+        <div style={{ width: FW * SCALE + 24, flex: "0 0 auto", display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
+            <b>实时预览</b>
+            <span style={{ flex: 1 }} />
+            <Button size="small" onClick={() => setTs(Date.now())}>刷新</Button>
+          </div>
+          <div className="preview-wrap" style={{ flex: 1 }}>
+            <div style={{ width: FW * SCALE, height: 2400 * SCALE, overflow: "hidden" }}>
+              <iframe
+                title="menu-preview"
+                className="preview-frame"
+                src={previewUrl}
+                style={{ width: FW, height: 2400, transform: `scale(${SCALE})`, transformOrigin: "top left" }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
