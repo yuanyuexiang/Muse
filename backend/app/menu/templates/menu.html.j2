@@ -1,0 +1,130 @@
+{% set FLAG = {'hot': '辣', 'vegetarian': '素', 'nut': '坚'} %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --brand: {{ theme.brand | safe }};
+    --accent: {{ theme.accent | safe }};
+    --band-text: {{ theme.band_text | safe }};
+    --serif: {{ theme.serif | safe }};
+  }
+  @page { size: {{ page.size }}; margin: 10mm 9mm 9mm 9mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans CJK SC", "PingFang SC", "DejaVu Sans", sans-serif;
+    color: #1f2a24; font-size: 10.5px; line-height: 1.35;
+  }
+
+  .header { text-align: center; border-bottom: 3px solid var(--brand); padding-bottom: 6px; margin-bottom: 8px; }
+  .brand { font-family: var(--serif); font-size: 30px; font-weight: 700; letter-spacing: 2px; color: var(--brand); line-height: 1.05; }
+  .tagline { color: var(--accent); font-style: italic; font-size: 12px; margin-top: 2px; }
+  .contact { margin-top: 4px; font-size: 9.5px; color: #444; }
+  .contact b { color: var(--brand); }
+
+  .promos { background: color-mix(in srgb, var(--brand) 7%, #fff); border: 1px solid color-mix(in srgb, var(--brand) 20%, #fff);
+            border-radius: 4px; padding: 4px 8px; margin-bottom: 8px; font-size: 9px; text-align: center; color: var(--brand); }
+  .promos span { margin: 0 6px; }
+
+  .gallery { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; justify-content: center; }
+  .gallery figure { margin: 0; width: 78px; text-align: center; }
+  .gallery img { width: 78px; height: 58px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+  .gallery figcaption { font-size: 8px; color: var(--brand); font-weight: 700; }
+
+  .body { column-count: {{ page.cols }}; column-gap: 7mm; }
+  .category { margin-bottom: 7px; }
+  .cat-title { background: var(--brand); color: var(--band-text); font-weight: 700; font-size: 11px; padding: 2px 6px; border-radius: 3px; margin: 0 0 3px; break-after: avoid; }
+  .item { break-inside: avoid; margin-bottom: 1px; }
+  .dish { display: flex; align-items: baseline; gap: 3px; }
+  .dnum { color: #8a8a8a; min-width: 15px; font-variant-numeric: tabular-nums; }
+  .dname { font-weight: 600; }
+  .leader { flex: 1 1 auto; border-bottom: 1px dotted #b9b9b9; position: relative; top: -3px; }
+  .dprice { font-weight: 700; white-space: nowrap; color: var(--brand); }
+  .ddesc { color: #7a7a7a; font-size: 8.5px; margin: 0 0 2px 15px; }
+
+  .flag { display: inline-block; font-size: 7.5px; line-height: 1; padding: 1px 3px; border-radius: 3px; margin-left: 3px; color: #fff; vertical-align: middle; }
+  .flag-hot { background: #c0392b; } .flag-vegetarian { background: #2e8b57; } .flag-nut { background: #8a5a2b; }
+
+  .setmeals { break-inside: avoid; margin-top: 4px; border: 1.5px solid var(--accent); border-radius: 5px; padding: 6px 8px; }
+  .setmeals h3 { margin: 0 0 4px; color: var(--accent); font-family: var(--serif); text-align: center; }
+  .setmeal { margin-bottom: 4px; }
+  .setmeal .sm-head { display: flex; justify-content: space-between; font-weight: 700; }
+  .setmeal .sm-items { color: #666; font-size: 8.5px; }
+
+  .footer { margin-top: 8px; border-top: 1.5px solid var(--brand); padding-top: 5px; display: flex; justify-content: space-between; gap: 10px; font-size: 8.5px; color: #444; }
+  .hours b { color: var(--brand); }
+  .allergen { color: #a33; max-width: 40%; }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="brand">{{ spec.shop.name or "餐厅名称" }}</div>
+    {% if spec.shop.tagline %}<div class="tagline">{{ spec.shop.tagline }}</div>{% endif %}
+    <div class="contact">
+      {% if spec.shop.phone %}<b>电话</b> {{ spec.shop.phone }}{% endif %}
+      {% if spec.shop.address %} &nbsp;·&nbsp; {{ spec.shop.address }}{% endif %}
+      {% if spec.shop.online_order_url %} &nbsp;·&nbsp; {{ spec.shop.online_order_url }}{% endif %}
+    </div>
+  </div>
+
+  {% if spec.shop.promotions %}
+  <div class="promos">{% for p in spec.shop.promotions %}<span>★ {{ p }}</span>{% endfor %}</div>
+  {% endif %}
+
+  {% if photos %}
+  <div class="gallery">
+    {% for ph in photos %}
+    <figure><img src="{{ ph.url }}" alt="">{% if ph.number %}<figcaption>{{ ph.number }}</figcaption>{% endif %}</figure>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="body">
+    {% for cat in spec.categories %}
+    <div class="category">
+      <div class="cat-title">{{ cat.name }}</div>
+      {% for d in cat.dishes %}
+      <div class="item">
+        <div class="dish">
+          {% if d.number %}<span class="dnum">{{ d.number }}</span>{% endif %}
+          <span class="dname">{{ d.name }}{% for f in d.flags %}<span class="flag flag-{{ f }}">{{ FLAG.get(f) or f[:1]|upper }}</span>{% endfor %}</span>
+          <span class="leader"></span>
+          {% if d.price %}<span class="dprice">{{ d.price }}</span>{% endif %}
+        </div>
+        {% if d.description %}<div class="ddesc">{{ d.description }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    {% if spec.set_meals %}
+    <div class="setmeals">
+      <h3>套餐 · Set Meals</h3>
+      {% for sm in spec.set_meals %}
+      <div class="setmeal">
+        <div class="sm-head"><span>{{ sm.name }}</span><span>{{ sm.price }}</span></div>
+        {% if sm.items %}<div class="sm-items">{{ sm.items | join(" · ") }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="footer">
+    <div class="hours">
+      {% if spec.shop.opening_hours %}<b>营业时间</b>　{{ spec.shop.opening_hours | select | join(" ｜ ") }}<br>{% endif %}
+      {% if spec.shop.delivery_terms %}{{ spec.shop.delivery_terms | select | join(" · ") }}{% endif %}
+    </div>
+    <div class="legend">
+      <span class="flag flag-hot">辣</span> 辣
+      <span class="flag flag-vegetarian">素</span> 素食
+      <span class="flag flag-nut">坚</span> 含坚果
+    </div>
+    {% if spec.shop.allergen_notice %}<div class="allergen">{{ spec.shop.allergen_notice }}</div>{% endif %}
+  </div>
+
+</body>
+</html>

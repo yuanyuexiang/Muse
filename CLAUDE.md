@@ -10,7 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**MUSE** (Menu Understanding & Service Engine) — an internal AI tool for a catering-design company: 客服 (customer-service staff) forward customer chat records to a WeCom bot, an LLM drafts a structured menu requirement, a human reviews it, and it's saved. Framed long-term as a general **AI Conversation Platform** (menu extraction is the first plugin); channels stay pluggable. **Do not hard-code WeCom specifics past the `channels/` boundary.**
+**MUSE** (Menu Understanding & Service Engine) — an internal AI tool for a **restaurant-menu DESIGN company**. The customer is a **restaurant owner**; the deliverable is a **print-ready menu PDF** (double-sided) sent to a print shop. Flow: 客服 forward the restaurant's menu content (dish lists / old menu photos / Excel) to a WeCom bot → an LLM extracts a structured **`MenuSpec`** (shop info + categorized dishes + prices + set meals) → a human reviews/edits it → it renders to PDF via an **HTML/CSS template + WeasyPrint**. Framed long-term as a general AI Conversation Platform; channels stay pluggable. **Do not hard-code WeCom specifics past the `channels/` boundary.**
+
+**Design = HTML/CSS → PDF, NOT Photoshop.** The print shop accepts high-res **RGB** PDF, so no CMYK/PDF-X needed — the menu is a data-driven HTML/CSS template (`app/menu/templates/menu.html.j2`) rendered by WeasyPrint. This replaced an earlier idea of driving Photoshop via MCP (no desktop host, no PSDs; template lives in Git and doubles as an in-browser preview). Verified end-to-end: a real menu photo → 224-dish `MenuSpec` → rendered 2-page PDF.
 
 Two facts that overturned the original design (both settled in ARCHITECTURE.md §四):
 - The bot is **internal-facing** — WeCom smart robots only receive messages from internal members, so 客服 forward customer chats to it. It never talks to external customers directly.
@@ -51,13 +53,17 @@ Single FastAPI app under [backend/app/](backend/app/) (no microservices at this 
 channels/           渠道抽象 — base.py (NormalizedMessage/InboundBatch) + wecom_bot.py (WeCom 长连接，官方 SDK，已实现)
 worker.py           机器人长连接常驻进程入口 (python -m app.worker)，独立于 API（一个机器人同一时刻仅一条连接）
 services.py         ingest_batch() 落库+去重 · run_extraction() 后台提取
-llm.py              extract_menu_requirement() — single structured LLM call; placeholder draft if LLM_API_KEY unset
-routers/            inbox · customers · batches · requirements · dev   (all mounted under /api)
-models.py           Customer · InboxMessage · CurationBatch · MenuRequirement   (the 4 Phase-1 tables)
+llm.py              extract_menu_spec() — single structured multimodal LLM call → MenuSpec; placeholder if LLM_API_KEY unset
+menu/               render.py (MenuSpec → HTML → WeasyPrint PDF) + templates/menu.html.j2 (the design template) + demo.py
+routers/            inbox · media · customers · batches · requirements · dev   (all mounted under /api)
+models.py           Customer · InboxMessage · CurationBatch · MenuRequirement (data JSONB holds the MenuSpec)
+schemas.py          MenuSpec / ShopInfo / MenuCategory / Dish / SetMeal — the menu content model
 storage.py          Storage protocol — LocalStorage now, MinioStorage TODO
 ```
 
-Pipeline: `channel/dev → services.ingest_batch → InboxMessage(new)` → human `POST /api/inbox/submit` (select customer + messages) → `CurationBatch` + **BackgroundTask** `run_extraction` → `llm.extract_menu_requirement` → `MenuRequirement(draft)` → human `PATCH`/`POST .../approve` → `approved`.
+Pipeline: `channel/dev → services.ingest_batch → InboxMessage(new)` → human `POST /api/inbox/submit` → `CurationBatch` + **BackgroundTask** `run_extraction` → `llm.extract_menu_spec` → `MenuRequirement(draft, data=MenuSpec)` → human edits in the batch editor → `PATCH` / `POST .../approve`. Render: `GET /api/requirements/{id}/menu.html` (preview, jinja2 only) and `/menu.pdf` (WeasyPrint).
+
+**WeasyPrint native libs (Pango) are installed via apt in the Dockerfile** (made non-fatal so the image still builds if the Debian mirror is flaky — then `menu.pdf` returns 503 and only `menu.html` works). This sandbox's Docker build cannot reach the Debian index, so PDF export is unavailable in-container here; on a normal machine it builds and works. For a demo without the container, render on the host with Playwright (`scratchpad/host_render_pw.py`) — same template.
 
 Frontend ([frontend/](frontend/)): Next 14 App Router client components — `app/inbox/page.tsx` and `app/batches/[id]/page.tsx` call `/api` via `lib/api.ts`; `next.config.mjs` rewrites `/api/*` to the backend (same-origin, no CORS). The batch page polls because extraction is async. The inbox supports media preview (`GET /api/media/{id}`), inline content edit with provenance (`InboxMessage.original_content`/`edited`, captured on first edit), and offset pagination (`GET /api/inbox?limit=&offset=` → `{items,total,limit,offset}`).
 

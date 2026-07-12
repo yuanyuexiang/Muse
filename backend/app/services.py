@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import models
 from app.channels.base import InboundBatch
 from app.db import SessionLocal
-from app.llm import extract_menu_requirement
+from app.llm import extract_menu_spec
 
 
 async def ingest_batch(session: AsyncSession, batch: InboundBatch) -> list[models.InboxMessage]:
@@ -52,7 +52,7 @@ async def run_extraction(batch_id: int) -> None:
                 .order_by(models.InboxMessage.seq)
             )
         )
-        data = await extract_menu_requirement(msgs)
+        data = await extract_menu_spec(msgs)
         req = models.MenuRequirement(
             batch_id=batch_id,
             customer_id=batch.customer_id,

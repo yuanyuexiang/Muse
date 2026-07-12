@@ -29,13 +29,44 @@ export interface InboxPage {
   offset: number;
 }
 
-export interface MenuRequirementData {
-  head_count: number | null;
-  budget: number | null;
-  dietary_restrictions: string[];
-  taste_preferences: string[];
-  dishes: string[];
-  event_type: string | null;
+export interface Dish {
+  number: string | null;
+  name: string;
+  description: string | null;
+  price: string | null;
+  flags: string[];
+  photo_object_key: string | null;
+}
+
+export interface MenuCategory {
+  name: string;
+  dishes: Dish[];
+}
+
+export interface SetMeal {
+  name: string;
+  price: string | null;
+  items: string[];
+}
+
+export interface ShopInfo {
+  name: string | null;
+  tagline: string | null;
+  phone: string | null;
+  address: string | null;
+  online_order_url: string | null;
+  opening_hours: string[];
+  delivery_terms: string[];
+  promotions: string[];
+  allergen_notice: string | null;
+  style_notes: string | null;
+}
+
+export interface MenuSpec {
+  shop: ShopInfo;
+  categories: MenuCategory[];
+  set_meals: SetMeal[];
+  theme: string;
   notes: string | null;
   missing_fields: string[];
 }
@@ -45,7 +76,7 @@ export interface MenuRequirement {
   batch_id: number;
   customer_id: number;
   version: number;
-  data: MenuRequirementData;
+  data: MenuSpec;
   status: string;
   reviewed_by: string | null;
   created_at: string;

@@ -3,17 +3,50 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 
-# ── LLM 结构化输出：菜单需求 ───────────────────────────────
-class MenuRequirementData(BaseModel):
-    """Menu Extraction Agent 的产出结构；也用作 LLM 的 response schema。"""
+# ── 餐厅菜单内容（MenuSpec）：设计一张菜单所需的完整结构 ──────
+# 客户是餐厅老板，要为其设计并印刷一张菜单。这才是"菜单需求"的真实结构，
+# 也是喂给 HTML/CSS 模板渲染成印刷 PDF 的数据源。
+class Dish(BaseModel):
+    number: str | None = Field(default=None, description="菜品编号，如 7a / 31")
+    name: str = Field(description="菜名")
+    description: str | None = Field(default=None, description="描述/做法/配料")
+    price: str | None = Field(default=None, description="价格，保留原样字符串，如 £6.00；可含区间")
+    flags: list[str] = Field(default_factory=list, description="标记：hot / vegetarian / nut")
+    photo_object_key: str | None = Field(default=None, description="关联菜品图在存储里的 key")
 
-    head_count: int | None = Field(default=None, description="人数")
-    budget: float | None = Field(default=None, description="预算（元）")
-    dietary_restrictions: list[str] = Field(default_factory=list, description="忌口 / 不吃")
-    taste_preferences: list[str] = Field(default_factory=list, description="口味偏好")
-    dishes: list[str] = Field(default_factory=list, description="明确提到的菜品")
-    event_type: str | None = Field(default=None, description="场合，如婚宴 / 家宴 / 团建")
-    notes: str | None = Field(default=None, description="其他要点")
+
+class MenuCategory(BaseModel):
+    name: str = Field(description="分类名，如 Appetizer / 米饭 / 咖喱")
+    dishes: list[Dish] = Field(default_factory=list)
+
+
+class SetMeal(BaseModel):
+    name: str
+    price: str | None = None
+    items: list[str] = Field(default_factory=list, description="套餐包含的菜")
+
+
+class ShopInfo(BaseModel):
+    name: str | None = Field(default=None, description="店名")
+    tagline: str | None = Field(default=None, description="标语/副标题")
+    phone: str | None = None
+    address: str | None = None
+    online_order_url: str | None = None
+    opening_hours: list[str] = Field(default_factory=list, description="营业时间，每行一条")
+    delivery_terms: list[str] = Field(default_factory=list, description="外送/起送/满减等条款")
+    promotions: list[str] = Field(default_factory=list, description="促销/赠品")
+    allergen_notice: str | None = Field(default=None, description="过敏原/声明")
+    style_notes: str | None = Field(default=None, description="风格/配色偏好（供设计参考）")
+
+
+class MenuSpec(BaseModel):
+    """一整份餐厅菜单的内容结构（提取产出 + 模板渲染输入）。"""
+
+    shop: ShopInfo = Field(default_factory=ShopInfo)
+    categories: list[MenuCategory] = Field(default_factory=list)
+    set_meals: list[SetMeal] = Field(default_factory=list)
+    theme: str = Field(default="classic", description="渲染主题：classic / crimson / ink")
+    notes: str | None = None
     missing_fields: list[str] = Field(default_factory=list, description="仍缺失、需补充的字段")
 
 
@@ -113,7 +146,7 @@ class MenuRequirementOut(BaseModel):
 
 
 class RequirementUpdate(BaseModel):
-    data: MenuRequirementData
+    data: MenuSpec
 
 
 class ApproveRequest(BaseModel):

@@ -1,11 +1,12 @@
-"""菜单提取：把一批筛过的消息 → 结构化 MenuRequirementData。
+"""菜单内容提取：把一批筛过的消息（文本 + 图片）→ 结构化 MenuSpec。
 
-Phase 1 就是**一次带结构化输出的 LLM 调用**，不需要 LangGraph。
-- 纯文本：单条字符串 prompt（已验证）。
-- 含图片：走多模态 content 数组，把图片以 image_url(data URL) 内联喂给 VLM
-  （qwen-vl-max 直读菜单图）。图片会先下采样再 base64，控制体积。
-未配置 LLM_API_KEY 时返回占位草稿，保证整条管线在没有 LLM / 凭证时也能端到端跑通。
-文件（Excel/PDF）暂作占位，文档解析另行处理（Document Agent，后续）。
+客户是餐厅老板，要为其设计一张菜单。提取的是**整份菜单的内容**：店铺信息、
+分类菜品(编号/名/描述/价/标记)、套餐 —— 这份结构既是审校对象，也是 HTML/CSS
+模板渲染成印刷 PDF 的数据源。
+
+Phase 1 就是**一次带结构化输出的多模态 LLM 调用**，不需要 LangGraph。
+- 图片(老菜单照片/Excel 截图)走 image_url 内联给 VLM(qwen-vl-max)直读。
+- 未配置 LLM_API_KEY 时返回占位草稿，保证管线在无 LLM/无凭证时也能端到端跑通。
 """
 
 import base64
@@ -15,25 +16,27 @@ import logging
 
 from app.config import settings
 from app.models import InboxMessage
-from app.schemas import MenuRequirementData
+from app.schemas import MenuSpec
 from app.storage import storage
 
 log = logging.getLogger("muse.llm")
 
 SYSTEM_PROMPT = (
-    "你是餐饮菜单需求整理助手。从客服转发的客户聊天（含图片）里，提取结构化的菜单需求。"
-    "只输出与客户需求相关的信息，忽略寒暄与客服的话。严格按给定 JSON schema 输出。"
+    "你是餐厅菜单结构化助手。餐厅老板通过客服发来菜品清单/老菜单照片/Excel 等，"
+    "你要把**整份菜单的内容**提取成 JSON：店铺信息(店名/标语/电话/地址/营业时间/"
+    "促销/过敏原)、所有分类及其菜品(编号 number / 名称 name / 描述 / 价格 price 保留"
+    "原样如 £6.00 / 标记 flags: hot|vegetarian|nut)、套餐 set_meals。尽量不漏菜。"
+    "拿不准的放进 missing_fields。严格按给定 JSON schema，只输出 JSON。"
 )
 
-_MIME = {
-    "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
-    "gif": "image/gif", "webp": "image/webp", "bmp": "image/bmp",
-}
+_MIME = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+         "gif": "image/gif", "webp": "image/webp", "bmp": "image/bmp"}
 
 
 def _schema_instruction() -> str:
-    schema = MenuRequirementData.model_json_schema()
-    return "请严格按此 JSON schema 输出，仅输出 JSON：\n" + json.dumps(schema, ensure_ascii=False)
+    return "请严格按此 JSON schema 输出，仅输出 JSON：\n" + json.dumps(
+        MenuSpec.model_json_schema(), ensure_ascii=False
+    )
 
 
 def _guess_mime(object_key: str) -> str:
@@ -42,7 +45,6 @@ def _guess_mime(object_key: str) -> str:
 
 
 def _image_data_url(object_key: str) -> str | None:
-    """从存储读图片 → 下采样 → base64 data URL。失败返回 None。"""
     try:
         raw = storage.load(object_key)
     except Exception as exc:  # noqa: BLE001
@@ -53,17 +55,51 @@ def _image_data_url(object_key: str) -> str | None:
         from PIL import Image
 
         img = Image.open(io.BytesIO(raw)).convert("RGB")
-        img.thumbnail((1600, 1600))  # 控制体积/token
+        img.thumbnail((1900, 1900))
         buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=85)
+        img.save(buf, format="JPEG", quality=88)
         raw, mime = buf.getvalue(), "image/jpeg"
-    except Exception as exc:  # noqa: BLE001 — 非图片或解码失败，回退原始字节
+    except Exception as exc:  # noqa: BLE001
         log.warning("image transcode fallback key=%s: %s", object_key, exc)
     return f"data:{mime};base64,{base64.b64encode(raw).decode()}"
 
 
-def _label(m: InboxMessage) -> str:
-    return f"[{m.seq}]"
+def _file_text(object_key: str, max_chars: int = 8000) -> str | None:
+    """抽取 Excel/PDF 正文喂给提取。扫描版 PDF(无文本层)返回 None。"""
+    ext = object_key.rsplit(".", 1)[-1].lower() if "." in object_key else ""
+    try:
+        raw = storage.load(object_key)
+    except Exception:  # noqa: BLE001
+        return None
+    try:
+        if ext in ("xlsx", "xlsm"):
+            from openpyxl import load_workbook
+
+            wb = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+            rows = []
+            for ws in wb.worksheets:
+                rows.append(f"# 工作表：{ws.title}")
+                for row in ws.iter_rows(values_only=True):
+                    cells = [str(c) for c in row if c is not None]
+                    if cells:
+                        rows.append(" | ".join(cells))
+            return "\n".join(rows)[:max_chars] or None
+        if ext == "pdf":
+            from pypdf import PdfReader
+
+            text = "\n".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(raw)).pages)
+            return text[:max_chars] if text.strip() else None
+    except Exception as exc:  # noqa: BLE001
+        log.warning("file parse failed key=%s: %s", object_key, exc)
+    return None
+
+
+def _file_or_placeholder(m: InboxMessage) -> str:
+    if m.type == "file" and m.object_key:
+        txt = _file_text(m.object_key)
+        if txt:
+            return f"[{m.seq}] 文件《{m.object_key.rsplit('/', 1)[-1]}》内容：\n{txt}"
+    return f"[{m.seq}] <{m.type}:{m.object_key or ''}>"
 
 
 def _has_images(messages: list[InboxMessage]) -> bool:
@@ -74,36 +110,35 @@ def _text_prompt(messages: list[InboxMessage]) -> str:
     lines = []
     for m in sorted(messages, key=lambda x: x.seq):
         if m.type == "text" or (m.type == "voice" and m.content):
-            lines.append(f"{_label(m)} {m.content or ''}")
+            lines.append(f"[{m.seq}] {m.content or ''}")
         else:
-            lines.append(f"{_label(m)} <{m.type}:{m.object_key or ''}>")
-    return "聊天记录：\n" + "\n".join(lines) + "\n\n" + _schema_instruction()
+            lines.append(_file_or_placeholder(m))
+    return "客户发来的内容：\n" + "\n".join(lines) + "\n\n" + _schema_instruction()
 
 
 def _multimodal_content(messages: list[InboxMessage]) -> list[dict]:
-    parts: list[dict] = [{"type": "text", "text": "以下是客服转发的客户聊天记录（含图片）："}]
+    parts: list[dict] = [{"type": "text", "text": "客户发来的内容（含图片）："}]
     for m in sorted(messages, key=lambda x: x.seq):
         if m.type == "image" and m.object_key:
             url = _image_data_url(m.object_key)
             if url:
-                parts.append({"type": "text", "text": f"{_label(m)} 图片："})
+                parts.append({"type": "text", "text": f"[{m.seq}] 图片："})
                 parts.append({"type": "image_url", "image_url": {"url": url}})
             else:
-                parts.append({"type": "text", "text": f"{_label(m)} <图片下载缺失>"})
+                parts.append({"type": "text", "text": f"[{m.seq}] <图片下载缺失>"})
         elif m.type == "text" or (m.type == "voice" and m.content):
-            parts.append({"type": "text", "text": f"{_label(m)} {m.content or ''}"})
+            parts.append({"type": "text", "text": f"[{m.seq}] {m.content or ''}"})
         else:
-            # file/其他：文档解析另行处理
-            parts.append({"type": "text", "text": f"{_label(m)} <{m.type}:{m.object_key or ''}>"})
+            parts.append({"type": "text", "text": _file_or_placeholder(m)})
     parts.append({"type": "text", "text": _schema_instruction()})
     return parts
 
 
-async def extract_menu_requirement(messages: list[InboxMessage]) -> MenuRequirementData:
+async def extract_menu_spec(messages: list[InboxMessage]) -> MenuSpec:
     if not settings.llm_api_key:
-        return MenuRequirementData(
+        return MenuSpec(
             notes="⚠️ LLM 未配置（占位草稿）。原始消息：\n" + _text_prompt(messages),
-            missing_fields=["head_count", "budget"],
+            missing_fields=["shop", "categories"],
         )
 
     from openai import AsyncOpenAI
@@ -123,10 +158,7 @@ async def extract_menu_requirement(messages: list[InboxMessage]) -> MenuRequirem
             temperature=0,
         )
         payload = json.loads(resp.choices[0].message.content or "{}")
-        return MenuRequirementData.model_validate(payload)
-    except Exception as exc:  # noqa: BLE001 — 提取失败不阻断，交人工审查
-        log.warning("extraction failed: %s", exc)
-        return MenuRequirementData(
-            notes=f"⚠️ LLM 提取失败：{exc}",
-            missing_fields=["head_count", "budget"],
-        )
+        return MenuSpec.model_validate(payload)
+    except Exception as exc:  # noqa: BLE001 — 提取失败不阻断，交人工审校
+        log.warning("menu extraction failed: %s", exc)
+        return MenuSpec(notes=f"⚠️ 菜单提取失败：{exc}", missing_fields=["shop", "categories"])

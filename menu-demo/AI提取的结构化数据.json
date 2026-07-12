@@ -1,0 +1,1995 @@
+{
+  "shop": {
+    "name": "Oriental Chef",
+    "tagline": "Chinese Food to Take Away",
+    "phone": "01622 791 368",
+    "address": "6 Premier Parade, The Avenue, Greenacres, Aylesford, Maidstone, Kent, ME20 7LN",
+    "online_order_url": "www.orderonlineorientalchefaylesford.com",
+    "opening_hours": [
+      "Open 6 Days A Week",
+      "SUNDAY - THURSDAY: 4:45pm - 10:00pm",
+      "FRIDAY & SATURDAY: 4:45pm - 10:30pm",
+      "CLOSED TUESDAY",
+      "Open all Bank Holidays"
+    ],
+    "delivery_terms": [
+      "Home Delivery Service",
+      "Delivery Charge from £1.50 and a Minimum Order of £18.00",
+      "We Charge Extra £2 For Under £18"
+    ],
+    "promotions": [
+      "Free Prawn Crackers with All Orders Over £25.00 (NOT INCLUDING DELIVERY FEE)",
+      "Free Prawn Crackers & Bottle of Soft Drink with All Orders Over £60.00 (NOT INCLUDING DELIVERY FEE)"
+    ],
+    "allergen_notice": "14 Thai Allergens Alert\nGARLIC, SOY, GLUTEN, COOKING WINE & SESAME OIL\nSome of our dishes may contain these 14 allergens as follows:\nIf you have any allergies to these products please inform us before ordering. We will do our best to advise you.",
+    "style_notes": "Green and yellow color scheme with cartoon chef illustration."
+  },
+  "categories": [
+    {
+      "name": "APPETIZER",
+      "dishes": [
+        {
+          "number": "1a",
+          "name": "Mixed Hats of deours (Mix of 2) ...Per Person",
+          "description": null,
+          "price": "£6.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "1b",
+          "name": "Mixed Saté, Chips, Rice, Chicken Wings",
+          "description": null,
+          "price": "£16.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "2",
+          "name": "Steamed Dried Fish Pips on Tow",
+          "description": null,
+          "price": "£5.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "3",
+          "name": "Sesame Prawns on Toast",
+          "description": null,
+          "price": "£6.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "4",
+          "name": "Smoked Shredded Chicken",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "5a",
+          "name": "Mini Vegetarian Spring Rolls",
+          "description": null,
+          "price": "£4.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "5b",
+          "name": "Shredded Duck Rolls",
+          "description": null,
+          "price": "£5.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "5c",
+          "name": "Curry Samosas",
+          "description": null,
+          "price": "£4.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "5d",
+          "name": "Salty Chicken on Skewers",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "5e",
+          "name": "Chicken with Garlic, Saté & Chilli",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "5f",
+          "name": "Squid with Garlic, Saté & Chilli",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "6",
+          "name": "Butterfly King Prawn",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "7",
+          "name": "King Prawn with Garlic, Saté & Chilli",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "8",
+          "name": "Chicken Wings with Garlic, Saté & Chilli",
+          "description": null,
+          "price": "£7.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "9",
+          "name": "Crispy Aromatic Duck",
+          "description": null,
+          "price": "£14.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "10",
+          "name": "Served with Pancakes, Cucumber, Spring Onion & Ho Sin Sauce",
+          "description": null,
+          "price": "£12.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "11",
+          "name": "Extra Pancakes",
+          "description": null,
+          "price": "£2.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "12",
+          "name": "Duck Salad",
+          "description": null,
+          "price": "£2.00",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "DIM SUM & SOUPS",
+      "dishes": [
+        {
+          "number": "01",
+          "name": "Crispy Chicken Dumplings",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "02",
+          "name": "Grilled Peking Dumpling",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "03",
+          "name": "Har Kau (Prawn in Rice Pastry)",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "04",
+          "name": "Siu Mai (Pork & Prawn in Su Pastry)",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "05",
+          "name": "Chicken Buns",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "06",
+          "name": "Char Siu Buns",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "07",
+          "name": "Steamed Cream Custard Bun",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "08",
+          "name": "Chicken & Mushroom Soup",
+          "description": null,
+          "price": "£4.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "09",
+          "name": "Chicken & Noodle Soup",
+          "description": null,
+          "price": "£4.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "10",
+          "name": "Chicken & Sweetcorn Soup",
+          "description": null,
+          "price": "£4.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "11",
+          "name": "Cranberry & Sweetcorn Soup",
+          "description": null,
+          "price": "£4.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "12",
+          "name": "Hot & Sour Soup",
+          "description": null,
+          "price": "£4.20",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "SPARE RIBS",
+      "dishes": [
+        {
+          "number": "15",
+          "name": "Barbecue Spare Ribs",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "15a",
+          "name": "Dry Spare Ribs",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "16",
+          "name": "Sweet & Sour Spare Ribs",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "17",
+          "name": "Spare Ribs in Peking Sauce",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "18",
+          "name": "Salt & Pepper Spare Ribs",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "19",
+          "name": "Honey Spare Ribs",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "RICE DISHES",
+      "dishes": [
+        {
+          "number": "19a",
+          "name": "Oriental Fried Rice (Large)",
+          "description": null,
+          "price": "£9.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "20",
+          "name": "House Special Fried Rice",
+          "description": null,
+          "price": "£9.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "21",
+          "name": "Special Fried Rice",
+          "description": null,
+          "price": "£6.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "22",
+          "name": "Beef Prawn Fried Rice",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "23",
+          "name": "Shredded Chicken Fried Rice",
+          "description": null,
+          "price": "£6.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "24",
+          "name": "Stir Fried Pork Fried Rice",
+          "description": null,
+          "price": "£6.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "25",
+          "name": "Stir Fry Beef Fried Rice",
+          "description": null,
+          "price": "£6.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "26",
+          "name": "Shredded Duck Fried Rice",
+          "description": null,
+          "price": "£7.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "27",
+          "name": "Singapore Fried Rice",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "28",
+          "name": "Mushroom Fried Rice",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "29",
+          "name": "Mixed Vegetable Fried Rice",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "30",
+          "name": "Egg Fried Rice",
+          "description": null,
+          "price": "£5.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "30a",
+          "name": "Boiled Rice",
+          "description": null,
+          "price": "£4.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "30b",
+          "name": "Roast Duck & Chicken Rice in Chinese Style",
+          "description": null,
+          "price": "£10.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "30c",
+          "name": "Roast Duck Rice in Chinese Style",
+          "description": null,
+          "price": "£10.80",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "CHOW MEIN (SOFT NOODLES)",
+      "dishes": [
+        {
+          "number": "31",
+          "name": "House Special Chow Mein (Large)",
+          "description": null,
+          "price": "£9.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "32",
+          "name": "Special Chow Mein",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "33",
+          "name": "King Prawn Chow Mein",
+          "description": null,
+          "price": "£7.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "34",
+          "name": "Shredded Chicken Chow Mein",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "34a",
+          "name": "Beef Chow Mein",
+          "description": null,
+          "price": "£7.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "35",
+          "name": "Roast Pork Chow Mein",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "36",
+          "name": "Shrimp Chow Mein",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "37",
+          "name": "Shredded Duck Chow Mein",
+          "description": null,
+          "price": "£7.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "38",
+          "name": "Singapore Chow Mein",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "39",
+          "name": "Mushroom Chow Mein",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "40",
+          "name": "Mixed Vegetable Chow Mein",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "41",
+          "name": "Plain Chow Mein",
+          "description": null,
+          "price": "£5.80",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "RICE NOODLES (LARGE/VERMICELLI)",
+      "dishes": [
+        {
+          "number": "R1",
+          "name": "Special Rice Noodle",
+          "description": null,
+          "price": "£8.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R2",
+          "name": "King Prawn Rice Noodle",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R3",
+          "name": "Shredded Chicken Rice Noodle",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R4",
+          "name": "Beef Rice Noodle",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R5",
+          "name": "Roast Pork Rice Noodle",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R6",
+          "name": "Shrimp Rice Noodle",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R7",
+          "name": "Shredded Duck Rice Noodle",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R8",
+          "name": "Mushroom Rice Noodle",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R9",
+          "name": "Mixed Vegetable Rice Noodle",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R10",
+          "name": "Beansprouts Rice Noodle",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R11",
+          "name": "Singapore Rice Noodle",
+          "description": null,
+          "price": "£8.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "R14",
+          "name": "Singapore Vegetarian Rice Noodle",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "CURRY",
+      "dishes": [
+        {
+          "number": "41",
+          "name": "House Special Curry",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "42",
+          "name": "King Prawn Curry",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "43",
+          "name": "Chicken Curry",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "44",
+          "name": "Beef Curry",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "45",
+          "name": "Roast Pork Curry",
+          "description": null,
+          "price": "£7.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "46",
+          "name": "Roast Duck Curry",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "47",
+          "name": "Mixed Vegetable Curry",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "47a",
+          "name": "Shrimp Curry",
+          "description": null,
+          "price": "£7.30",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "THAI CURRY",
+      "dishes": [
+        {
+          "number": "T1",
+          "name": "Thai Green Chicken Curry",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "T2",
+          "name": "Thai Green Beef Curry",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "T3",
+          "name": "Thai Green King Prawn Curry",
+          "description": null,
+          "price": "£8.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "T4",
+          "name": "Thai Green Mixed Vegetables Curry",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "SWEET & SOUR DISHES",
+      "dishes": [
+        {
+          "number": "48",
+          "name": "Sweet & Sour Chicken Balls",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "49",
+          "name": "Sweet & Sour King Prawn Balls",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "50",
+          "name": "Sweet & Sour Pork Balls",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "51",
+          "name": "Sweet & Sour Mixed Vegetables",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "52",
+          "name": "Sweet & Sour Pork Hong Kong Style",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "53",
+          "name": "Sweet & Sour Chicken Hong Kong Style",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "53a",
+          "name": "Sweet & Sour King Prawn Hong Kong Style",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "PORK DISHES",
+      "dishes": [
+        {
+          "number": "54",
+          "name": "Roast Pork Chinese Style",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "55",
+          "name": "Roast Pork with Mushrooms",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "56",
+          "name": "Roast Pork with Mixed Vegetables",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "56a",
+          "name": "Roast Pork with Broccoli",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "57",
+          "name": "Roast Pork with Green Peppers in Black Bean Sauce",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "58",
+          "name": "Roast Pork with Cashew Nuts in Yellow Bean Sauce",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "59",
+          "name": "Roast Pork with Bamboo Shoots & Water Chestnuts",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "59a",
+          "name": "Roast Pork with Beansprouts",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "CHICKEN DISHES",
+      "dishes": [
+        {
+          "number": "60",
+          "name": "Chicken & Mushrooms",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "61",
+          "name": "Chicken & Mixed Vegetables",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "61a",
+          "name": "Chicken with Broccoli",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "62",
+          "name": "Chicken with Green Peppers in Black Bean Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "63",
+          "name": "Black Bean & Pineapple",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "64",
+          "name": "Chicken & Tomatoes",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "65",
+          "name": "Chicken in Chili Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "65a",
+          "name": "Chicken with Sweet & Sour Chili Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "67",
+          "name": "Chicken with Bamboo Shoots & Water Chestnuts",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "68",
+          "name": "Chicken with Ginger Style",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "69",
+          "name": "Chicken with Ginger & Spring Onion",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "70",
+          "name": "Chicken with Cashew Nuts in Yellow Bean Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "71",
+          "name": "Chicken in Oyster Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "BEEF DISHES",
+      "dishes": [
+        {
+          "number": "72",
+          "name": "Beef & Mushrooms",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "73",
+          "name": "Beef with Onions",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "74",
+          "name": "Beef & Mixed Vegetables",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "74a",
+          "name": "Beef with Broccoli",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "75",
+          "name": "Beef with Green Peppers in Black Bean Sauce",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "76",
+          "name": "Beef & Tomatoes",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "77",
+          "name": "Beef in Chili Sauce",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "78",
+          "name": "Beef with Bamboo Shoots & Water Chestnuts",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "79",
+          "name": "Beef with Oyster Sauce",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "80",
+          "name": "Beef with Ginger & Spring Onions",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "80a",
+          "name": "Beef in Plum Sauce",
+          "description": null,
+          "price": "£8.40",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "DUCK DISHES",
+      "dishes": [
+        {
+          "number": "81",
+          "name": "Roast Duck with Mushrooms",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "81a",
+          "name": "Duck with Broccoli",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "82",
+          "name": "Roast Duck with Pineapple",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "83",
+          "name": "Roast Duck Chinese Style",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "83a",
+          "name": "Duck with Green Pepper & Black Bean Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "83b",
+          "name": "Duck with Ginger & Spring Onion",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "83c",
+          "name": "Duck in Plum Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "83d",
+          "name": "Duck with Beansprouts",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "KING PRAWN DISHES",
+      "dishes": [
+        {
+          "number": "84",
+          "name": "King Prawn & Mushrooms",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "85",
+          "name": "King Prawn & Mixed Vegetables",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "86",
+          "name": "King Prawn with Green Peppers in Black Bean Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "87",
+          "name": "King Prawn with Cashew Nuts in Yellow Bean Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "88",
+          "name": "King Prawn & Pineapple",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "89",
+          "name": "King Prawn with Tomatoes",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "90",
+          "name": "King Prawn with Chili Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "91",
+          "name": "King Prawn with Beansprouts",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "92",
+          "name": "King Prawn with Bamboo Shoots & Water Chestnuts",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "93",
+          "name": "King Prawn in Garlic Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "94",
+          "name": "King Prawn in Oyster Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "95",
+          "name": "King Prawn in Sweet Chili Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "96",
+          "name": "King Prawn with Ginger & Spring Onion",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "96a",
+          "name": "King Prawn with Broccoli",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "FOO YUNG DISHES",
+      "dishes": [
+        {
+          "number": "97",
+          "name": "Special Foo Yung",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "98",
+          "name": "Beef Chop Foo Yung",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "99",
+          "name": "Chicken Foo Yung",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "100",
+          "name": "Shrimp Foo Yung",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "101",
+          "name": "Mushroom Foo Yung",
+          "description": null,
+          "price": "£7.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "101a",
+          "name": "Plain Foo Yung",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "CHOP SUEY DISHES (BEANSPROUTS)",
+      "dishes": [
+        {
+          "number": "102",
+          "name": "Special Chop Suey",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "103",
+          "name": "King Prawn Chop Suey",
+          "description": null,
+          "price": "£7.90",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "104",
+          "name": "Chicken Chop Suey",
+          "description": null,
+          "price": "£7.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "105",
+          "name": "Beef Chop Suey",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "106",
+          "name": "Roast Pork Chop Suey",
+          "description": null,
+          "price": "£7.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "106a",
+          "name": "Roast Duck Chop Suey",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "107",
+          "name": "Shrimp Chop Suey",
+          "description": null,
+          "price": "£7.70",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "ENGLISH DISHES",
+      "dishes": [
+        {
+          "number": "107",
+          "name": "Special Omelette with Chips",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "108",
+          "name": "King Prawn Omelette with Chips",
+          "description": null,
+          "price": "£9.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "109",
+          "name": "Chicken Omelette with Chips",
+          "description": null,
+          "price": "£8.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "110",
+          "name": "Mushroom Omelette with Chips",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "110a",
+          "name": "Plain Omelette with Chips",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "111",
+          "name": "Roast Pork Omelette with Chips",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "112",
+          "name": "1/4 Roast Chicken with Chips",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "113",
+          "name": "Sausages with Chips",
+          "description": null,
+          "price": "£6.50",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "VEGETABLES DISHES",
+      "dishes": [
+        {
+          "number": "V1",
+          "name": "Stir Fried Beansprouts",
+          "description": null,
+          "price": "£5.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V2",
+          "name": "Stir Fried Onion",
+          "description": null,
+          "price": "£5.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V3",
+          "name": "Stir Fried Mushroom",
+          "description": null,
+          "price": "£5.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V4",
+          "name": "Mushroom with Green Pepper",
+          "description": null,
+          "price": "£6.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V5",
+          "name": "Black Bean Sauce",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V6",
+          "name": "Mixed Vegetable with Green Pepper & Black Bean Sauce",
+          "description": null,
+          "price": "£6.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V7",
+          "name": "Stir Fried Garlic Chinese Leaf",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V8",
+          "name": "Stir Fried Mixed Vegetables",
+          "description": null,
+          "price": "£6.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V9",
+          "name": "Plain Bamboo Shoots & Water Chestnuts",
+          "description": null,
+          "price": "£6.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "V10",
+          "name": "Stir Fried Broccoli",
+          "description": null,
+          "price": "£6.20",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "DESSERTS",
+      "dishes": [
+        {
+          "number": "27",
+          "name": "Banana Fritters",
+          "description": null,
+          "price": "£4.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "28",
+          "name": "Pineapple Fritters",
+          "description": null,
+          "price": "£4.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "29",
+          "name": "Apple Fritters",
+          "description": null,
+          "price": "£4.00",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "CHEF'S SPECIALS",
+      "dishes": [
+        {
+          "number": "30",
+          "name": "King Prawn in Garlic Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "31",
+          "name": "King Prawn in Chili Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "32",
+          "name": "King Prawn in Oyster Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "33",
+          "name": "Crispy Chili Beef",
+          "description": null,
+          "price": "£8.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "33a",
+          "name": "Crispy Chili Chicken",
+          "description": null,
+          "price": "£8.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "34",
+          "name": "Lemon Chicken",
+          "description": null,
+          "price": "£8.90",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "35",
+          "name": "Beef in Black Pepper Sauce",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "36",
+          "name": "Chicken in Black Pepper Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "37",
+          "name": "Chicken in Spicy Sauce",
+          "description": null,
+          "price": "£8.20",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "38",
+          "name": "Beef in Spicy Sauce",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "39",
+          "name": "King Prawn in Spicy Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "40",
+          "name": "King Prawn in Black Pepper Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "42",
+          "name": "Chicken in Szechuan Sauce",
+          "description": null,
+          "price": "£8.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "43",
+          "name": "Beef in Szechuan Sauce",
+          "description": null,
+          "price": "£8.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "44",
+          "name": "King Prawn in Szechuan Sauce",
+          "description": null,
+          "price": "£8.80",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "TOFU (Beancurd)",
+      "dishes": [
+        {
+          "number": "45",
+          "name": "Tofu with Green Pepper Black Beans",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "46",
+          "name": "Tofu with Sweet & Sour Bean Sauce",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "47",
+          "name": "Tofu with Mixed Vegetables",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "48",
+          "name": "Tofu with Garlic, Salt & Chili",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "49",
+          "name": "Tofu in Chili Sauce",
+          "description": null,
+          "price": "£7.00",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "SEAFOOD DISHES",
+      "dishes": [
+        {
+          "number": "50",
+          "name": "Mussels in Chili Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "51",
+          "name": "Mussels in Black Bean Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "52",
+          "name": "Mixed Seafood with Green Pepper & Black Bean Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "53",
+          "name": "Squid with Green Pepper & Black Bean Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "54",
+          "name": "Squid with Chili Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "55",
+          "name": "Squid with Ginger & Spring Onions",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "56",
+          "name": "Squid with Black Pepper Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "57",
+          "name": "Squid with Spicy Sauce",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "157a",
+          "name": "Mixed Seafood in Ginger & Spring Onion",
+          "description": null,
+          "price": "£8.60",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    },
+    {
+      "name": "EXTRA DISHES + SAUCE",
+      "dishes": [
+        {
+          "number": "115",
+          "name": "Spring Roll (bean sprout with shredded roast pork)",
+          "description": null,
+          "price": "£2.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "116",
+          "name": "Prawn Crackers",
+          "description": null,
+          "price": "£3.00",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "117",
+          "name": "Drinks (Can/330ml)",
+          "description": null,
+          "price": "£1.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "118",
+          "name": "Bottle of Water (500ml)",
+          "description": null,
+          "price": "£1.40",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "119",
+          "name": "Bottle of Drinks",
+          "description": null,
+          "price": "£2.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "120",
+          "name": "Hot Sin Sauce",
+          "description": null,
+          "price": "£2.70",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "121",
+          "name": "Satay Sauce",
+          "description": null,
+          "price": "£2.80",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "122",
+          "name": "Salt & Chili Chips",
+          "description": null,
+          "price": "£5.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "123",
+          "name": "Chips",
+          "description": null,
+          "price": "£4.30",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "124",
+          "name": "Garlic Sauce",
+          "description": null,
+          "price": "£4.60",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "125",
+          "name": "Barbecue Sauce",
+          "description": null,
+          "price": "£2.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "126",
+          "name": "Sweet & Sour Sauce",
+          "description": null,
+          "price": "£2.50",
+          "flags": [],
+          "photo_object_key": null
+        },
+        {
+          "number": "126a",
+          "name": "Black Bean Sauce",
+          "description": null,
+          "price": "£2.70",
+          "flags": [],
+          "photo_object_key": null
+        }
+      ]
+    }
+  ],
+  "set_meals": [
+    {
+      "name": "SET MEAL FOR 1",
+      "price": "£12.00",
+      "items": [
+        "Chicken Chop Suey",
+        "Sweet & Sour Pork Balls",
+        "Egg Fried Rice"
+      ]
+    },
+    {
+      "name": "A FOR 2 PERSONS",
+      "price": "£27.50",
+      "items": [
+        "Spring Rolls",
+        "Chicken with Mushrooms",
+        "King Prawn Chop Suey",
+        "Sweet & Sour Pork Balls",
+        "Egg Fried Rice"
+      ]
+    },
+    {
+      "name": "B FOR 2 PERSONS",
+      "price": "£33.50",
+      "items": [
+        "Crispy Aromatic Duck",
+        "Chicken with Green Peppers in Black Bean Sauce",
+        "Stir Fried Mixed Vegetables",
+        "Special Fried Rice"
+      ]
+    },
+    {
+      "name": "C FOR 2 PERSONS",
+      "price": "£44.00",
+      "items": [
+        "Shredded Duck Roll",
+        "Beef with Green Peppers in Black Bean Sauce",
+        "Sweet & Sour Pork Hong Kong Style",
+        "Stir Fried Mixed Vegetables",
+        "King Prawn with Mushroom",
+        "Special Fried Rice"
+      ]
+    },
+    {
+      "name": "D FOR 4 PERSONS",
+      "price": "£57.50",
+      "items": [
+        "Mini Vegetarian Rolls",
+        "Barbecue Spare Ribs",
+        "Beef with Mushrooms",
+        "Sweet & Sour Chicken Hong Kong Style",
+        "King Prawn with Pineapple",
+        "Stir Fried Mixed Vegetables",
+        "Special Fried Rice"
+      ]
+    }
+  ],
+  "notes": "Menu valid until June 2026. All prices include VAT.",
+  "missing_fields": []
+}
