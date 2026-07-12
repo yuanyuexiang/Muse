@@ -11,6 +11,8 @@ export interface InboxMessage {
   forwarded_by: string | null;
   type: string;
   content: string | null;
+  original_content: string | null;
+  edited: boolean;
   object_key: string | null;
   download_status: string;
   sender_role: string;
@@ -18,6 +20,13 @@ export interface InboxMessage {
   customer_id: number | null;
   batch_id: number | null;
   created_at: string;
+}
+
+export interface InboxPage {
+  items: InboxMessage[];
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface MenuRequirementData {

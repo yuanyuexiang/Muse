@@ -45,6 +45,8 @@ class InboxMessageOut(BaseModel):
     forwarded_by: str | None
     type: str
     content: str | None
+    original_content: str | None
+    edited: bool
     object_key: str | None
     download_status: str
     sender_role: str
@@ -54,9 +56,20 @@ class InboxMessageOut(BaseModel):
     created_at: datetime
 
 
-class InboxMessageUpdate(BaseModel):
-    """人工在收件箱里的微调：改顺序 / 标注发送者 / 丢弃。"""
+class InboxPage(BaseModel):
+    items: list["InboxMessageOut"]
+    total: int
+    limit: int
+    offset: int
 
+
+class InboxMessageUpdate(BaseModel):
+    """人工在收件箱里的微调：改内容 / 改顺序 / 标注发送者 / 丢弃。
+
+    只有显式传入的字段会被更新（后端用 exclude_unset 判断）。
+    """
+
+    content: str | None = None  # 文本行修正；媒体行则作为人工注释
     seq: int | None = None
     sender_role: str | None = None
     status: str | None = None  # 传 "discarded" 丢弃

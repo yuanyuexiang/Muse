@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
-import type { Customer, InboxMessage } from "@/lib/types";
+import type { Customer, InboxMessage, InboxPage } from "@/lib/types";
 
 export default function InboxPage() {
   const router = useRouter();
@@ -14,25 +14,37 @@ export default function InboxPage() {
   const [newName, setNewName] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [draft, setDraft] = useState("");
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const PAGE = 50;
 
-  async function load() {
+  async function loadInbox(off = 0) {
     setLoading(true);
     setErr("");
     try {
-      const [m, c] = await Promise.all([
-        api<InboxMessage[]>("/inbox"),
-        api<Customer[]>("/customers"),
-      ]);
-      setMessages(m);
-      setCustomers(c);
+      const page = await api<InboxPage>(`/inbox?limit=${PAGE}&offset=${off}`);
+      setMessages(page.items);
+      setTotal(page.total);
+      setOffset(page.offset);
     } catch (e) {
       setErr(String(e instanceof Error ? e.message : e));
     }
     setLoading(false);
   }
 
+  async function loadCustomers() {
+    try {
+      setCustomers(await api<Customer[]>("/customers"));
+    } catch (e) {
+      setErr(String(e instanceof Error ? e.message : e));
+    }
+  }
+
   useEffect(() => {
-    load();
+    loadInbox(0);
+    loadCustomers();
   }, []);
 
   function toggle(id: number) {
@@ -64,12 +76,12 @@ export default function InboxPage() {
       method: "PATCH",
       body: JSON.stringify({ status: "discarded" }),
     });
-    setMessages((ms) => ms.filter((m) => m.id !== id));
     setSelected((s) => {
       const n = new Set(s);
       n.delete(id);
       return n;
     });
+    loadInbox(offset);
   }
 
   async function submit() {
@@ -85,8 +97,7 @@ export default function InboxPage() {
     }
   }
 
-  function renderContent(m: InboxMessage) {
-    if (m.type === "text" || (m.type === "voice" && m.content)) return m.content;
+  function renderMedia(m: InboxMessage) {
     if (!m.object_key) {
       return (
         <span className="muted">
@@ -102,12 +113,64 @@ export default function InboxPage() {
         </a>
       );
     }
-    const name = m.object_key.split("/").pop();
     return (
       <a href={src} target="_blank" rel="noreferrer">
-        📎 {name}
+        📎 {m.object_key.split("/").pop()}
       </a>
     );
+  }
+
+  function editedBadge(m: InboxMessage) {
+    if (!m.edited) return null;
+    return (
+      <span className="badge" title={m.original_content ? `原文：${m.original_content}` : "原内容为空"}>
+        已编辑
+      </span>
+    );
+  }
+
+  function renderContent(m: InboxMessage) {
+    if (m.type === "text" || (m.type === "voice" && m.content)) {
+      return (
+        <span>
+          {m.content} {editedBadge(m)}
+        </span>
+      );
+    }
+    return (
+      <div>
+        {renderMedia(m)}
+        {m.content && (
+          <div className="note">
+            📝 {m.content} {editedBadge(m)}
+          </div>
+        )}
+        {m.edited && !m.content && <div>{editedBadge(m)}</div>}
+      </div>
+    );
+  }
+
+  function startEdit(m: InboxMessage) {
+    setEditingId(m.id);
+    setDraft(m.content || "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setDraft("");
+  }
+
+  async function saveEdit(id: number) {
+    try {
+      const updated = await api<InboxMessage>(`/inbox/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ content: draft }),
+      });
+      setMessages((ms) => ms.map((m) => (m.id === id ? updated : m)));
+      cancelEdit();
+    } catch (e) {
+      setErr(String(e instanceof Error ? e.message : e));
+    }
   }
 
   if (loading) return <p>加载中…</p>;
@@ -142,8 +205,26 @@ export default function InboxPage() {
         <button className="primary" disabled={!customerId || selected.size === 0} onClick={submit}>
           提交选中 {selected.size} 条 → AI 整理
         </button>
-        <button onClick={load}>刷新</button>
+        <button onClick={() => loadInbox(offset)}>刷新</button>
       </div>
+
+      {total > 0 && (
+        <div className="toolbar pager">
+          <span className="muted">
+            共 {total} 条，显示 {offset + 1}–{offset + messages.length}
+          </span>
+          <span className="spacer" />
+          <button disabled={offset === 0} onClick={() => loadInbox(Math.max(0, offset - PAGE))}>
+            上一页
+          </button>
+          <button
+            disabled={offset + messages.length >= total}
+            onClick={() => loadInbox(offset + PAGE)}
+          >
+            下一页
+          </button>
+        </div>
+      )}
 
       {messages.length === 0 ? (
         <p className="muted">暂无待整理消息。客服在企业微信里逐条转发后会出现在这里。</p>
@@ -171,9 +252,30 @@ export default function InboxPage() {
                 </td>
                 <td>{m.seq}</td>
                 <td>{m.type}</td>
-                <td>{renderContent(m)}</td>
+                <td>
+                  {editingId === m.id ? (
+                    <div className="editbox">
+                      {m.type !== "text" && renderMedia(m)}
+                      <textarea
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        rows={3}
+                        placeholder={m.type === "text" ? "修正文本…" : "为该图片/文件加文字说明…"}
+                      />
+                      <div className="actions">
+                        <button className="primary" onClick={() => saveEdit(m.id)}>
+                          保存
+                        </button>
+                        <button onClick={cancelEdit}>取消</button>
+                      </div>
+                    </div>
+                  ) : (
+                    renderContent(m)
+                  )}
+                </td>
                 <td>{m.forwarded_by}</td>
                 <td>
+                  <button onClick={() => startEdit(m)}>编辑</button>{" "}
                   <button onClick={() => discard(m.id)}>丢弃</button>
                 </td>
               </tr>

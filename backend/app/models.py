@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -54,7 +54,9 @@ class InboxMessage(Base):
     forwarded_by: Mapped[str | None] = mapped_column(String(128), nullable=True)  # 转发的客服
 
     type: Mapped[str] = mapped_column(String(16))          # text | image | file | voice | video | mixed
-    content: Mapped[str | None] = mapped_column(Text, nullable=True)             # 文本内容 / 转写文本
+    content: Mapped[str | None] = mapped_column(Text, nullable=True)             # 文本内容 / 转写文本（可被人工编辑）
+    original_content: Mapped[str | None] = mapped_column(Text, nullable=True)    # 首次编辑前的原文（留痕）
+    edited: Mapped[bool] = mapped_column(Boolean, default=False)                 # 是否被人工编辑过
     object_key: Mapped[str | None] = mapped_column(String(256), nullable=True)   # 媒体在存储里的 key
     download_status: Mapped[str] = mapped_column(String(16), default=DL_OK)
 

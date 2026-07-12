@@ -59,7 +59,7 @@ storage.py          Storage protocol — LocalStorage now, MinioStorage TODO
 
 Pipeline: `channel/dev → services.ingest_batch → InboxMessage(new)` → human `POST /api/inbox/submit` (select customer + messages) → `CurationBatch` + **BackgroundTask** `run_extraction` → `llm.extract_menu_requirement` → `MenuRequirement(draft)` → human `PATCH`/`POST .../approve` → `approved`.
 
-Frontend ([frontend/](frontend/)): Next 14 App Router client components — `app/inbox/page.tsx` and `app/batches/[id]/page.tsx` call `/api` via `lib/api.ts`; `next.config.mjs` rewrites `/api/*` to the backend (same-origin, no CORS). The batch page polls because extraction is async.
+Frontend ([frontend/](frontend/)): Next 14 App Router client components — `app/inbox/page.tsx` and `app/batches/[id]/page.tsx` call `/api` via `lib/api.ts`; `next.config.mjs` rewrites `/api/*` to the backend (same-origin, no CORS). The batch page polls because extraction is async. The inbox supports media preview (`GET /api/media/{id}`), inline content edit with provenance (`InboxMessage.original_content`/`edited`, captured on first edit), and offset pagination (`GET /api/inbox?limit=&offset=` → `{items,total,limit,offset}`).
 
 ## Invariants (don't break these)
 
