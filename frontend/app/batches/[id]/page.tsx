@@ -24,6 +24,7 @@ export default function BatchPage({ params }: { params: { id: string } }) {
   const [form, setForm] = useState<MenuSpec | null>(null);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
+  const [templates, setTemplates] = useState<{ key: string; label: string; desc: string }[]>([]);
 
   useEffect(() => {
     let stop = false;
@@ -49,6 +50,12 @@ export default function BatchPage({ params }: { params: { id: string } }) {
       stop = true;
     };
   }, [batchId]);
+
+  useEffect(() => {
+    api<{ key: string; label: string; desc: string }[]>("/templates")
+      .then(setTemplates)
+      .catch(() => {});
+  }, []);
 
   // ── 不可变更新辅助 ──
   const updShop = (patch: Partial<ShopInfo>) =>
@@ -169,7 +176,6 @@ export default function BatchPage({ params }: { params: { id: string } }) {
   const approved = req?.status === "approved";
   const dishCount = form ? form.categories.reduce((n, c) => n + c.dishes.length, 0) : 0;
   const images = batch.messages.filter((m) => m.type === "image" && m.object_key);
-  const THEMES = ["classic", "crimson", "ink"];
 
   return (
     <div>
@@ -183,11 +189,6 @@ export default function BatchPage({ params }: { params: { id: string } }) {
         <>
           <div className="toolbar">
             <span className="muted">{form.categories.length} 个分类 · {dishCount} 道菜 · {form.set_meals.length} 套餐</span>
-            <label>主题：
-              <select value={form.theme} onChange={(e) => setForm((f) => (f ? { ...f, theme: e.target.value } : f))}>
-                {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </label>
             <span className="spacer" />
             <button onClick={() => saveThenOpen(`/api/requirements/${req.id}/menu.html?theme=${form.theme}`)}>预览网页</button>
             <button onClick={() => saveThenOpen(`/api/requirements/${req.id}/menu.pdf?theme=${form.theme}`)}>预览 PDF</button>
@@ -195,6 +196,25 @@ export default function BatchPage({ params }: { params: { id: string } }) {
             <button className="primary" onClick={approve} disabled={approved}>审校通过入库</button>
             <span className="ok">{approved ? "已入库" : ""} {msg}</span>
           </div>
+
+          {templates.length > 0 && (
+            <div className="tmpl-picker">
+              <span className="tmpl-label">模板：</span>
+              {templates.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  className={`tmpl-card${form.theme === t.key ? " sel" : ""}`}
+                  onClick={() => setForm((f) => (f ? { ...f, theme: t.key } : f))}
+                  title={t.desc}
+                >
+                  <img src={`/templates/${t.key}.png`} alt={t.label} />
+                  <div className="tmpl-name">{t.label}</div>
+                  <div className="tmpl-desc">{t.desc}</div>
+                </button>
+              ))}
+            </div>
+          )}
 
           {form.missing_fields.length > 0 && (
             <p className="warn">缺失/待确认：{form.missing_fields.join("、")}</p>

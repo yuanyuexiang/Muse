@@ -1,0 +1,59 @@
+{% set FLAG = {'hot': '辣', 'vegetarian': '素', 'nut': '坚'} %}
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><style>
+  @page { size: {{ page.size }}; margin: 11mm 10mm; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Noto Sans CJK SC","PingFang SC","DejaVu Sans",sans-serif; color:#2b211c; font-size:11px; line-height:1.4; background:#fbf7f0; }
+  .header { text-align:center; margin-bottom:10px; }
+  .brand { font-family:"Noto Serif CJK SC","Songti SC","DejaVu Serif",serif; font-size:32px; font-weight:700; color:#b0472b; letter-spacing:1px; }
+  .tagline { color:#c9821f; font-style:italic; font-size:13px; }
+  .contact { margin-top:4px; font-size:10px; color:#6b5b4f; }
+  .rule { height:2px; background:linear-gradient(90deg,transparent,#c9821f,transparent); margin:6px 0 10px; }
+  .promos { text-align:center; font-size:10px; color:#b0472b; margin-bottom:10px; }
+  .promos span { margin:0 8px; }
+  .cat-title { font-family:"Noto Serif CJK SC",serif; color:#b0472b; font-size:15px; font-weight:700; border-bottom:2px solid #e6c9a8; padding-bottom:3px; margin:6px 0 6px; break-after:avoid; }
+  .cards { column-count:2; column-gap:8mm; }
+  .card { break-inside:avoid; display:flex; gap:8px; padding:6px; margin-bottom:6px; background:#fff; border:1px solid #eaddca; border-radius:6px; }
+  .card img { width:56px; height:56px; object-fit:cover; border-radius:5px; flex:0 0 56px; }
+  .card .noimg { width:56px; height:56px; border-radius:5px; flex:0 0 56px; background:#f2e7d6; }
+  .card .info { flex:1; min-width:0; }
+  .card .top { display:flex; justify-content:space-between; align-items:baseline; gap:6px; }
+  .card .name { font-weight:700; }
+  .card .price { color:#b0472b; font-weight:700; white-space:nowrap; }
+  .card .desc { color:#8a7a6c; font-size:9px; margin-top:2px; }
+  .num { color:#b39a86; font-size:9px; margin-right:3px; }
+  .flag { display:inline-block; font-size:8px; padding:1px 3px; border-radius:3px; margin-left:3px; color:#fff; }
+  .flag-hot{background:#c0392b}.flag-vegetarian{background:#2e8b57}.flag-nut{background:#8a5a2b}
+  .setmeals { break-inside:avoid; margin-top:8px; background:#fff; border:1.5px solid #c9821f; border-radius:6px; padding:8px 10px; }
+  .setmeals h3 { margin:0 0 5px; color:#c9821f; font-family:"Noto Serif CJK SC",serif; text-align:center; }
+  .setmeal { display:flex; justify-content:space-between; font-weight:700; } .sm-items { color:#8a7a6c; font-size:9px; font-weight:400; margin-bottom:5px; }
+  .footer { margin-top:10px; border-top:1px solid #e6c9a8; padding-top:6px; font-size:9px; color:#6b5b4f; text-align:center; }
+</style></head><body>
+  <div class="header">
+    <div class="brand">{{ spec.shop.name or "餐厅名称" }}</div>
+    {% if spec.shop.tagline %}<div class="tagline">{{ spec.shop.tagline }}</div>{% endif %}
+    <div class="contact">{% if spec.shop.phone %}电话 {{ spec.shop.phone }}{% endif %}{% if spec.shop.address %} · {{ spec.shop.address }}{% endif %}</div>
+  </div>
+  <div class="rule"></div>
+  {% if spec.shop.promotions %}<div class="promos">{% for p in spec.shop.promotions %}<span>★ {{ p }}</span>{% endfor %}</div>{% endif %}
+  <div class="cards">
+    {% for cat in spec.categories %}
+    <div style="break-inside:avoid"><div class="cat-title">{{ cat.name }}</div></div>
+    {% for d in cat.dishes %}
+    <div class="card">
+      {% set u = photo_urls.get(d.photo_object_key) if d.photo_object_key else None %}
+      {% if u %}<img src="{{ u }}" alt="">{% else %}<div class="noimg"></div>{% endif %}
+      <div class="info">
+        <div class="top"><span class="name">{% if d.number %}<span class="num">{{ d.number }}</span>{% endif %}{{ d.name }}{% for f in d.flags %}<span class="flag flag-{{ f }}">{{ FLAG.get(f) or f[:1]|upper }}</span>{% endfor %}</span>{% if d.price %}<span class="price">{{ d.price }}</span>{% endif %}</div>
+        {% if d.description %}<div class="desc">{{ d.description }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+    {% if spec.set_meals %}<div class="setmeals"><h3>套餐 · Set Meals</h3>{% for sm in spec.set_meals %}<div class="setmeal"><span>{{ sm.name }}</span><span>{{ sm.price }}</span></div>{% if sm.items %}<div class="sm-items">{{ sm.items | join(" · ") }}</div>{% endif %}{% endfor %}</div>{% endif %}
+  </div>
+  <div class="footer">
+    {% if spec.shop.opening_hours %}{{ spec.shop.opening_hours | select | join(" ｜ ") }}<br>{% endif %}
+    <span class="flag flag-hot">辣</span> 辣　<span class="flag flag-vegetarian">素</span> 素食　<span class="flag flag-nut">坚</span> 含坚果
+    {% if spec.shop.allergen_notice %}<br>{{ spec.shop.allergen_notice }}{% endif %}
+  </div>
+</body></html>

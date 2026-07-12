@@ -1,0 +1,51 @@
+{% set FLAG = {'hot': '辣', 'vegetarian': '素', 'nut': '坚'} %}
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><style>
+  @page { size: {{ page.size }}; margin: 16mm 15mm; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Noto Serif CJK SC","Songti SC","DejaVu Serif",serif; color:#2c2a26; font-size:11px; line-height:1.5; background:#fdfbf6; }
+  .header { text-align:center; margin-bottom:14px; }
+  .rule-top { width:60px; height:1px; background:#a6842c; margin:0 auto 8px; }
+  .brand { font-size:34px; font-weight:700; letter-spacing:3px; }
+  .tagline { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:#a6842c; margin-top:4px; }
+  .contact { font-size:9.5px; letter-spacing:1px; color:#7c766c; margin-top:6px; }
+  .divider { text-align:center; color:#a6842c; margin:10px 0 14px; letter-spacing:6px; font-size:9px; }
+  .promos { text-align:center; font-size:9.5px; color:#8a7326; font-style:italic; margin-bottom:12px; }
+  .body { column-count:2; column-gap:12mm; }
+  .category { break-inside:avoid-column; margin-bottom:14px; }
+  .cat-title { text-align:center; font-size:14px; letter-spacing:2px; margin:0 0 8px; break-after:avoid; }
+  .cat-title::before, .cat-title::after { content:"—"; color:#c9b98a; margin:0 8px; }
+  .dish { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:4px; break-inside:avoid; }
+  .dname { font-weight:600; } .dnum { color:#b3a983; font-size:9px; margin-right:4px; }
+  .dprice { color:#a6842c; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .ddesc { color:#948d80; font-size:9px; font-style:italic; margin:0 0 6px 2px; }
+  .mk { color:#a6842c; font-size:8.5px; margin-left:5px; letter-spacing:1px; }
+  .setmeals { break-inside:avoid; text-align:center; margin-top:12px; padding-top:10px; border-top:1px solid #e6ddc4; }
+  .setmeals h3 { font-size:14px; letter-spacing:3px; color:#a6842c; margin:0 0 6px; }
+  .setmeal { margin-bottom:4px; } .setmeal .nm { font-weight:600; } .setmeal .pr { color:#a6842c; } .setmeal .it { color:#948d80; font-size:9px; font-style:italic; }
+  .footer { text-align:center; margin-top:16px; padding-top:8px; border-top:1px solid #e6ddc4; font-size:9px; letter-spacing:1px; color:#7c766c; }
+</style></head><body>
+  <div class="header">
+    <div class="rule-top"></div>
+    <div class="brand">{{ spec.shop.name or "餐厅名称" }}</div>
+    {% if spec.shop.tagline %}<div class="tagline">{{ spec.shop.tagline }}</div>{% endif %}
+    <div class="contact">{% if spec.shop.phone %}{{ spec.shop.phone }}{% endif %}{% if spec.shop.address %}　·　{{ spec.shop.address }}{% endif %}</div>
+  </div>
+  <div class="divider">◆ ◆ ◆</div>
+  {% if spec.shop.promotions %}<div class="promos">{{ spec.shop.promotions | select | join("　·　") }}</div>{% endif %}
+  <div class="body">
+    {% for cat in spec.categories %}
+    <div class="category">
+      <div class="cat-title">{{ cat.name }}</div>
+      {% for d in cat.dishes %}
+      <div class="dish"><span class="dname">{% if d.number %}<span class="dnum">{{ d.number }}</span>{% endif %}{{ d.name }}{% if d.flags %}<span class="mk">{% for f in d.flags %}{{ FLAG.get(f) or f }}{% endfor %}</span>{% endif %}</span>{% if d.price %}<span class="dprice">{{ d.price }}</span>{% endif %}</div>
+      {% if d.description %}<div class="ddesc">{{ d.description }}</div>{% endif %}
+      {% endfor %}
+    </div>
+    {% endfor %}
+    {% if spec.set_meals %}<div class="setmeals"><h3>套餐</h3>{% for sm in spec.set_meals %}<div class="setmeal"><span class="nm">{{ sm.name }}</span>　<span class="pr">{{ sm.price }}</span>{% if sm.items %}<div class="it">{{ sm.items | join(" · ") }}</div>{% endif %}</div>{% endfor %}</div>{% endif %}
+  </div>
+  <div class="footer">
+    {% if spec.shop.opening_hours %}{{ spec.shop.opening_hours | select | join("　｜　") }}{% endif %}
+    {% if spec.shop.allergen_notice %}<br>{{ spec.shop.allergen_notice }}{% endif %}
+  </div>
+</body></html>

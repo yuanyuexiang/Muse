@@ -1,8 +1,7 @@
 """菜单渲染：MenuSpec → HTML(模板) → 印刷 PDF（WeasyPrint，RGB）。
 
-印刷厂接受高清 RGB PDF，所以不需要 CMYK/PDF-X —— 直接 HTML/CSS 渲染即可。
-支持：多主题（CSS 变量）、页面尺寸、菜品照片（从存储读出内联为 data URI）。
-同一模板也能在后台当网页预览（render_menu_html）。
+模板 = 一套完整版式（布局 + 配色）。每个模板是一个独立 .j2 文件；加模板只需
+放一个新文件 + 在 TEMPLATES 登记。同一模板也能当网页预览（render_menu_html）。
 """
 
 import base64
@@ -20,16 +19,12 @@ _env = Environment(
     autoescape=select_autoescape(["html", "j2", "xml"]),
 )
 
-# 主题：一套 CSS 变量。设计师加主题只需在这里加一项 + 备好配色。
-THEMES: dict[str, dict] = {
-    "classic": {"brand": "#1e5b3e", "accent": "#b8860b", "band_text": "#ffffff",
-                "serif": '"Noto Serif CJK SC", "Songti SC", "DejaVu Serif", serif'},
-    "crimson": {"brand": "#8c1c2b", "accent": "#c9a227", "band_text": "#ffffff",
-                "serif": '"Noto Serif CJK SC", "Songti SC", "DejaVu Serif", serif'},
-    "ink":     {"brand": "#232323", "accent": "#a67c00", "band_text": "#ffffff",
-                "serif": '"Noto Serif CJK SC", "Songti SC", "DejaVu Serif", serif'},
+TEMPLATES: dict[str, dict] = {
+    "classic": {"file": "classic.html.j2", "label": "经典密集", "desc": "分类多、菜品密、价目虚线，适合外卖店"},
+    "photo":   {"file": "photo.html.j2",   "label": "图片主导", "desc": "每道菜配图卡片，适合正餐/精品店"},
+    "elegant": {"file": "elegant.html.j2", "label": "高端简约", "desc": "留白多、字体讲究，适合宴会/私厨"},
 }
-DEFAULT_THEME = "classic"
+DEFAULT_TEMPLATE = "classic"
 
 PAGES: dict[str, dict] = {
     "A4": {"size": "A4", "cols": 3},
@@ -39,7 +34,7 @@ PAGES: dict[str, dict] = {
 DEFAULT_PAGE = "A4"
 
 
-def _photo_data_url(object_key: str, box: int = 360) -> str | None:
+def _photo_data_url(object_key: str, box: int = 480) -> str | None:
     try:
         raw = storage.load(object_key)
     except Exception:  # noqa: BLE001
@@ -50,29 +45,43 @@ def _photo_data_url(object_key: str, box: int = 360) -> str | None:
         img = Image.open(io.BytesIO(raw)).convert("RGB")
         img.thumbnail((box, box))
         buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=80)
+        img.save(buf, format="JPEG", quality=82)
         raw = buf.getvalue()
     except Exception:  # noqa: BLE001
         pass
     return f"data:image/jpeg;base64,{base64.b64encode(raw).decode()}"
 
 
-def _photos(spec: MenuSpec) -> list[dict]:
+def _photo_urls(spec: MenuSpec) -> dict[str, str]:
+    urls: dict[str, str] = {}
+    for cat in spec.categories:
+        for d in cat.dishes:
+            if d.photo_object_key and d.photo_object_key not in urls:
+                u = _photo_data_url(d.photo_object_key)
+                if u:
+                    urls[d.photo_object_key] = u
+    return urls
+
+
+def _photos_list(spec: MenuSpec, urls: dict[str, str]) -> list[dict]:
     out = []
     for cat in spec.categories:
         for d in cat.dishes:
-            if d.photo_object_key:
-                url = _photo_data_url(d.photo_object_key)
-                if url:
-                    out.append({"number": d.number or "", "name": d.name, "url": url})
+            if d.photo_object_key and urls.get(d.photo_object_key):
+                out.append({"number": d.number or "", "name": d.name, "url": urls[d.photo_object_key]})
     return out
 
 
+def _template_key(v: str | None) -> str:
+    return v if v in TEMPLATES else DEFAULT_TEMPLATE
+
+
 def render_menu_html(spec: MenuSpec, theme: str | None = None, page: str | None = None) -> str:
-    name = theme or spec.theme or DEFAULT_THEME
-    t = THEMES.get(name, THEMES[DEFAULT_THEME])
+    key = _template_key(theme or spec.theme or DEFAULT_TEMPLATE)
     pg = PAGES.get(page or DEFAULT_PAGE, PAGES[DEFAULT_PAGE])
-    return _env.get_template("menu.html.j2").render(spec=spec, theme=t, page=pg, photos=_photos(spec))
+    urls = _photo_urls(spec)
+    tmpl = _env.get_template(TEMPLATES[key]["file"])
+    return tmpl.render(spec=spec, page=pg, photos=_photos_list(spec, urls), photo_urls=urls)
 
 
 def render_menu_pdf(spec: MenuSpec, theme: str | None = None, page: str | None = None) -> bytes:
