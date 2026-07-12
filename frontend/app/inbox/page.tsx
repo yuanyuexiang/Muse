@@ -85,6 +85,31 @@ export default function InboxPage() {
     }
   }
 
+  function renderContent(m: InboxMessage) {
+    if (m.type === "text" || (m.type === "voice" && m.content)) return m.content;
+    if (!m.object_key) {
+      return (
+        <span className="muted">
+          &lt;{m.type} {m.download_status === "failed" ? "下载失败" : "下载中"}&gt;
+        </span>
+      );
+    }
+    const src = `/api/media/${m.id}`;
+    if (m.type === "image") {
+      return (
+        <a href={src} target="_blank" rel="noreferrer">
+          <img src={src} alt="" className="thumb" />
+        </a>
+      );
+    }
+    const name = m.object_key.split("/").pop();
+    return (
+      <a href={src} target="_blank" rel="noreferrer">
+        📎 {name}
+      </a>
+    );
+  }
+
   if (loading) return <p>加载中…</p>;
 
   return (
@@ -146,17 +171,7 @@ export default function InboxPage() {
                 </td>
                 <td>{m.seq}</td>
                 <td>{m.type}</td>
-                <td>
-                  {m.type === "text" ? (
-                    m.content
-                  ) : (
-                    <span className="muted">
-                      &lt;{m.type}
-                      {m.object_key ? "" : m.download_status === "failed" ? " 下载失败" : " 下载中"}
-                      &gt;
-                    </span>
-                  )}
-                </td>
+                <td>{renderContent(m)}</td>
                 <td>{m.forwarded_by}</td>
                 <td>
                   <button onClick={() => discard(m.id)}>丢弃</button>

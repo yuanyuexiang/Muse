@@ -39,6 +39,7 @@ textarea { min-height: 60px; }
 .form input, .form textarea { font-size: 14px; color: #111; }
 .actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
 
+.thumb { max-height: 72px; max-width: 160px; border: 1px solid #e5e7eb; border-radius: 6px; display: block; }
 .msglist { padding-left: 18px; line-height: 1.8; }
 .muted { color: #888; }
 .warn { color: #b45309; }
