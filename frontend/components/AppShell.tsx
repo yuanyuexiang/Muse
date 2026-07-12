@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConfigProvider, Layout, Menu } from "antd";
 import zhCN from "antd/locale/zh_CN";
-import { DashboardOutlined, InboxOutlined, ProfileOutlined } from "@ant-design/icons";
+import { BgColorsOutlined, DashboardOutlined, InboxOutlined, ProfileOutlined } from "@ant-design/icons";
 
 const { Sider, Header, Content } = Layout;
 
@@ -14,6 +14,7 @@ const NAV = [
   { key: "/", icon: <DashboardOutlined />, label: <Link href="/">仪表盘</Link> },
   { key: "/inbox", icon: <InboxOutlined />, label: <Link href="/inbox">待整理收件箱</Link> },
   { key: "/batches", icon: <ProfileOutlined />, label: <Link href="/batches">菜单批次</Link> },
+  { key: "/templates", icon: <BgColorsOutlined />, label: <Link href="/templates">模板管理</Link> },
 ];
 
 function pageMeta(pathname: string): { selected: string; title: string } {
@@ -21,6 +22,7 @@ function pageMeta(pathname: string): { selected: string; title: string } {
     return { selected: "/batches", title: "菜单审校" };
   if (pathname.startsWith("/batches")) return { selected: "/batches", title: "菜单批次" };
   if (pathname.startsWith("/inbox")) return { selected: "/inbox", title: "待整理收件箱" };
+  if (pathname.startsWith("/templates")) return { selected: "/templates", title: "模板管理" };
   return { selected: "/", title: "仪表盘" };
 }
 

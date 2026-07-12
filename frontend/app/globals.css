@@ -6,9 +6,12 @@ html, body { padding: 0; margin: 0; }
 .tmpl-card { width: 132px; padding: 5px; border: 2px solid #e8e8e8; border-radius: 8px; background: #fff; cursor: pointer; text-align: center; }
 .tmpl-card:hover { border-color: #9fc4ae; }
 .tmpl-card.sel { border-color: #1e5b3e; box-shadow: 0 0 0 2px #d7e5dc; }
-.tmpl-card img { width: 100%; height: 118px; object-fit: cover; object-position: top; border-radius: 4px; border: 1px solid #eee; display: block; }
 .tmpl-name { font-weight: 700; font-size: 12px; margin-top: 3px; }
 .tmpl-desc { font-size: 10px; color: #999; line-height: 1.25; }
+/* 样例渲染缩略图（iframe 缩放裁剪）；不吃点击，卡片仍可选 */
+.tmpl-thumb { height: 292px; overflow: hidden; background: #fff; border-bottom: 1px solid #f0f0f0; }
+.tmpl-thumb-sm { height: 116px; overflow: hidden; background: #fff; border-radius: 4px; border: 1px solid #eee; }
+.tmpl-thumb iframe, .tmpl-thumb-sm iframe { pointer-events: none; }
 
 /* 右栏实时预览 iframe */
 .preview-wrap { overflow: auto; background: #eee; border-radius: 6px; }

@@ -27,3 +27,9 @@ async def init_db() -> None:
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # 首次播种内置菜单模板
+    from app.menu.store import seed_templates
+
+    async with SessionLocal() as session:
+        await seed_templates(session)

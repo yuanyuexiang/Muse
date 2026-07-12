@@ -180,7 +180,14 @@ export default function BatchEditor({ params }: { params: { id: string } }) {
                     onClick={() => setForm((f) => (f ? { ...f, theme: t.key } : f))}
                     title={t.desc}
                   >
-                    <img src={`/templates/${t.key}.png`} alt={t.label} />
+                    <div className="tmpl-thumb-sm">
+                      <iframe
+                        title={t.key}
+                        src={`/api/templates/${t.key}/sample.html`}
+                        scrolling="no"
+                        style={{ width: 800, height: 780, border: 0, transform: "scale(0.15)", transformOrigin: "top left" }}
+                      />
+                    </div>
                     <div className="tmpl-name">{t.label}</div>
                     <div className="tmpl-desc">{t.desc}</div>
                   </div>

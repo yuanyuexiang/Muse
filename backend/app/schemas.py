@@ -151,3 +151,39 @@ class RequirementUpdate(BaseModel):
 
 class ApproveRequest(BaseModel):
     reviewed_by: str | None = None
+
+
+# ── 模板管理 ──────────────────────────────────────────────
+class TemplateOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    key: str
+    label: str
+    description: str | None
+    enabled: bool
+    sort_order: int
+
+
+class TemplateDetail(TemplateOut):
+    html: str
+
+
+class TemplateCreate(BaseModel):
+    key: str
+    label: str
+    description: str | None = None
+    html: str
+    enabled: bool = True
+    sort_order: int = 0
+
+
+class TemplateUpdate(BaseModel):
+    label: str | None = None
+    description: str | None = None
+    html: str | None = None
+    enabled: bool | None = None
+    sort_order: int | None = None
+
+
+class PreviewIn(BaseModel):
+    html: str

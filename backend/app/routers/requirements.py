@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models
 from app.db import get_session
-from app.menu.render import render_menu_html, render_menu_pdf
+from app.menu.render import render_html, render_pdf
+from app.menu.store import resolve_template_src
 from app.schemas import ApproveRequest, MenuRequirementOut, MenuSpec, RequirementUpdate
 
 router = APIRouter(prefix="/requirements", tags=["requirements"])
@@ -71,7 +72,11 @@ async def preview_menu_html(
     session: AsyncSession = Depends(get_session),
 ):
     """把菜单渲染成网页，供后台内嵌/新标签预览（无需 PDF 依赖）。"""
-    return HTMLResponse(render_menu_html(await _spec(req_id, session), theme=theme, page=page))
+    spec = await _spec(req_id, session)
+    src = await resolve_template_src(session, theme or spec.theme)
+    if not src:
+        raise HTTPException(500, "无可用模板")
+    return HTMLResponse(render_html(spec, src, page))
 
 
 @router.get("/{req_id}/menu.pdf")
@@ -83,8 +88,11 @@ async def preview_menu_pdf(
 ):
     """印刷级 PDF（WeasyPrint）。渲染依赖缺失时返回 503 而非 500。"""
     spec = await _spec(req_id, session)
+    src = await resolve_template_src(session, theme or spec.theme)
+    if not src:
+        raise HTTPException(500, "无可用模板")
     try:
-        pdf = render_menu_pdf(spec, theme=theme, page=page)
+        pdf = render_pdf(spec, src, page)
     except Exception as exc:  # noqa: BLE001 — WeasyPrint 原生库未装等
         raise HTTPException(503, f"PDF 渲染依赖未就绪：{exc}") from exc
     return Response(

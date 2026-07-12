@@ -81,6 +81,23 @@ class CurationBatch(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class MenuTemplate(Base):
+    """菜单版式模板（HTML/CSS Jinja 源码），后台可管理/在线编辑。"""
+
+    __tablename__ = "menu_templates"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(48), unique=True, index=True)
+    label: Mapped[str] = mapped_column(String(64))
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    html: Mapped[str] = mapped_column(Text)  # Jinja2 模板源码
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
 class MenuRequirement(Base):
     """LLM 提取出的结构化菜单需求（草稿→审查→入库），带版本。"""
 

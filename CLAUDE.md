@@ -54,7 +54,8 @@ channels/           渠道抽象 — base.py (NormalizedMessage/InboundBatch) + 
 worker.py           机器人长连接常驻进程入口 (python -m app.worker)，独立于 API（一个机器人同一时刻仅一条连接）
 services.py         ingest_batch() 落库+去重 · run_extraction() 后台提取
 llm.py              extract_menu_spec() — single structured multimodal LLM call → MenuSpec; placeholder if LLM_API_KEY unset
-menu/               render.py (MenuSpec → HTML → WeasyPrint PDF) + templates/menu.html.j2 (the design template) + demo.py
+menu/               render.py (render_html/render_pdf(spec, template_src, page) — source-based) + store.py (seed + resolve_template_src) + templates/*.j2 (seed sources for classic/photo/elegant)
+                    Templates are DB-backed (models.MenuTemplate), seeded on init_db from the .j2 files, managed in the /templates admin page (list/edit HTML+CSS/enable/CRUD). Render endpoints resolve the source from DB by MenuSpec.theme (the template key).
 routers/            inbox · media · customers · batches · requirements · dev   (all mounted under /api)
 models.py           Customer · InboxMessage · CurationBatch · MenuRequirement (data JSONB holds the MenuSpec)
 schemas.py          MenuSpec / ShopInfo / MenuCategory / Dish / SetMeal — the menu content model
