@@ -207,6 +207,9 @@ export default function InboxPage() {
         </button>
         <button onClick={() => loadInbox(offset)}>刷新</button>
       </div>
+      <p className="muted hint">
+        ① 选或新建客户　② 勾选要整理的消息（菜单图 / 文字 / 文件）　③ 点「提交」→ 自动进入菜单审校编辑器
+      </p>
 
       {total > 0 && (
         <div className="toolbar pager">

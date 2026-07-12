@@ -137,8 +137,17 @@ export default function BatchPage({ params }: { params: { id: string } }) {
     }
   }
 
-  async function saveThenOpen(path: string) {
-    if (await save()) window.open(path, "_blank");
+  function saveThenOpen(path: string) {
+    // 在点击手势内**同步**开一个空白标签，避开弹窗拦截；填地址前尽量先保存。
+    const url = window.location.origin + path;
+    const w = window.open("about:blank", "_blank");
+    const go = () => {
+      if (w) w.location.href = url;
+      else window.location.href = url; // 万一被拦截，退化为当前页跳转
+    };
+    // 已入库无需保存；未入库先保存再预览（即便保存失败也展示已存版本，不吞掉预览）。
+    if (req?.status === "approved") go();
+    else save().finally(go);
   }
 
   async function approve() {

@@ -10,6 +10,36 @@ from app.services import run_extraction
 router = APIRouter(prefix="/batches", tags=["batches"])
 
 
+@router.get("")
+async def list_batches(session: AsyncSession = Depends(get_session)):
+    """所有批次列表（供后台"菜单批次"页），带客户名/店名/菜品数/状态。"""
+    batches = list(
+        await session.scalars(select(models.CurationBatch).order_by(models.CurationBatch.id.desc()))
+    )
+    out = []
+    for b in batches:
+        cust = await session.get(models.Customer, b.customer_id)
+        req = await session.scalar(
+            select(models.MenuRequirement)
+            .where(models.MenuRequirement.batch_id == b.id)
+            .order_by(models.MenuRequirement.version.desc())
+        )
+        data = (req.data or {}) if req else {}
+        dish_count = sum(len(c.get("dishes", [])) for c in data.get("categories", []))
+        out.append({
+            "id": b.id,
+            "status": b.status,
+            "customer_id": b.customer_id,
+            "customer_name": cust.name if cust else None,
+            "shop_name": (data.get("shop") or {}).get("name"),
+            "req_id": req.id if req else None,
+            "req_status": req.status if req else None,
+            "dish_count": dish_count,
+            "created_at": b.created_at.isoformat() if b.created_at else None,
+        })
+    return out
+
+
 @router.get("/{batch_id}")
 async def get_batch(batch_id: int, session: AsyncSession = Depends(get_session)):
     batch = await session.get(models.CurationBatch, batch_id)
