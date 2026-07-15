@@ -8,12 +8,15 @@ from app.menu.render import seed_templates_data
 
 
 async def seed_templates(session: AsyncSession) -> None:
-    n = await session.scalar(select(func.count()).select_from(models.MenuTemplate))
-    if n:
-        return
+    """播种缺失的内置模板（新增内置模板会被补进来；不覆盖已编辑的）。"""
+    existing = set(await session.scalars(select(models.MenuTemplate.key)))
+    added = False
     for t in seed_templates_data():
-        session.add(models.MenuTemplate(**t))
-    await session.commit()
+        if t["key"] not in existing:
+            session.add(models.MenuTemplate(**t))
+            added = True
+    if added:
+        await session.commit()
 
 
 async def resolve_template_src(session: AsyncSession, key: str | None) -> str | None:

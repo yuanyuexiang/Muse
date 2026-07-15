@@ -37,6 +37,17 @@ class ShopInfo(BaseModel):
     promotions: list[str] = Field(default_factory=list, description="促销/赠品")
     allergen_notice: str | None = Field(default=None, description="过敏原/声明")
     style_notes: str | None = Field(default=None, description="风格/配色偏好（供设计参考）")
+    logo_object_key: str | None = Field(default=None, description="店招 logo 图在存储里的 key")
+    hero_object_key: str | None = Field(default=None, description="主视觉/招牌大图在存储里的 key")
+
+
+class PageSpec(BaseModel):
+    """成品页面：预设或自定义尺寸 + 朝向 + 出血。菜单常见 A4 横排，也有非标尺寸。"""
+
+    preset: str = Field(default="a4-landscape", description="a4 / a4-landscape / a3 / a3-landscape / a5 / custom")
+    width_mm: float | None = Field(default=None, description="自定义宽（mm），preset=custom 时用")
+    height_mm: float | None = Field(default=None, description="自定义高（mm）")
+    bleed_mm: float = Field(default=0.0, description="出血（mm），印刷常用 3")
 
 
 class MenuSpec(BaseModel):
@@ -45,7 +56,8 @@ class MenuSpec(BaseModel):
     shop: ShopInfo = Field(default_factory=ShopInfo)
     categories: list[MenuCategory] = Field(default_factory=list)
     set_meals: list[SetMeal] = Field(default_factory=list)
-    theme: str = Field(default="classic", description="渲染主题：classic / crimson / ink")
+    page: PageSpec = Field(default_factory=PageSpec)
+    theme: str = Field(default="classic", description="模板 key（渲染用哪套版式）")
     notes: str | None = None
     missing_fields: list[str] = Field(default_factory=list, description="仍缺失、需补充的字段")
 

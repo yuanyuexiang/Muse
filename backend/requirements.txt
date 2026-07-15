@@ -13,3 +13,4 @@ Pillow>=10.0
 weasyprint>=62
 jinja2>=3.1
 pypdf>=4.0
+segno>=1.6

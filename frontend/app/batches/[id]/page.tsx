@@ -15,7 +15,9 @@ import {
   message,
 } from "antd";
 import { api } from "@/lib/api";
-import type { Batch, Dish, MenuRequirement, MenuSpec, ShopInfo } from "@/lib/types";
+import type { Batch, Dish, MenuRequirement, MenuSpec, PageSpec, ShopInfo } from "@/lib/types";
+
+const DEFAULT_PAGE: PageSpec = { preset: "a4-landscape", width_mm: null, height_mm: null, bleed_mm: 0 };
 
 const FLAG_OPTS = [
   { label: "辣", value: "hot" },
@@ -50,7 +52,7 @@ export default function BatchEditor({ params }: { params: { id: string } }) {
         const r = b.requirements[0] || null;
         if (r) {
           setReq(r);
-          setForm((prev) => prev ?? r.data);
+          setForm((prev) => prev ?? { ...r.data, page: r.data.page ?? DEFAULT_PAGE });
           setTs((t) => t || Date.now());
         } else if (tries++ < 12) setTimeout(poll, 1500);
       } catch (e) {
@@ -128,6 +130,8 @@ export default function BatchEditor({ params }: { params: { id: string } }) {
 
   // ── 不可变更新 ──
   const updShop = (p: Partial<ShopInfo>) => setForm((f) => (f ? { ...f, shop: { ...f.shop, ...p } } : f));
+  const updPage = (p: Partial<PageSpec>) =>
+    setForm((f) => (f ? { ...f, page: { ...(f.page || DEFAULT_PAGE), ...p } } : f));
   const updCat = (ci: number, name: string) =>
     setForm((f) => (f ? { ...f, categories: f.categories.map((c, i) => (i === ci ? { ...c, name } : c)) } : f));
   const addCat = () =>
@@ -196,6 +200,33 @@ export default function BatchEditor({ params }: { params: { id: string } }) {
             </Card>
           )}
 
+          {/* 页面设置 */}
+          <Card size="small" title="页面设置（尺寸 / 朝向 / 出血）" style={{ marginBottom: 10 }}>
+            <Space wrap>
+              <Select
+                style={{ width: 150 }}
+                value={form.page?.preset ?? "a4-landscape"}
+                onChange={(v) => updPage({ preset: v })}
+                options={[
+                  { value: "a4-landscape", label: "A4 横排" },
+                  { value: "a4", label: "A4 竖排" },
+                  { value: "a3-landscape", label: "A3 横排" },
+                  { value: "a3", label: "A3 竖排" },
+                  { value: "a5", label: "A5 竖排" },
+                  { value: "custom", label: "自定义尺寸" },
+                ]}
+              />
+              {form.page?.preset === "custom" && (
+                <>
+                  <Input style={{ width: 130 }} addonBefore="宽" suffix="mm" value={form.page.width_mm ?? ""} onChange={(e) => updPage({ width_mm: e.target.value ? Number(e.target.value) : null })} />
+                  <Input style={{ width: 130 }} addonBefore="高" suffix="mm" value={form.page.height_mm ?? ""} onChange={(e) => updPage({ height_mm: e.target.value ? Number(e.target.value) : null })} />
+                </>
+              )}
+              <Input style={{ width: 150 }} addonBefore="出血" suffix="mm" value={form.page?.bleed_mm ?? 0} onChange={(e) => updPage({ bleed_mm: Number(e.target.value) || 0 })} />
+              <span style={{ color: "#aaa", fontSize: 12 }}>非标准尺寸选「自定义」填 mm；出血印刷常用 3mm</span>
+            </Space>
+          </Card>
+
           {form.missing_fields.length > 0 && (
             <div style={{ color: "#d46b08", marginBottom: 10 }}>缺失/待确认：{form.missing_fields.join("、")}</div>
           )}
@@ -229,6 +260,28 @@ export default function BatchEditor({ params }: { params: { id: string } }) {
               </Col>
               <Col span={24}>
                 <Input.TextArea rows={1} placeholder="过敏原/声明" value={form.shop.allergen_notice ?? ""} onChange={(e) => updShop({ allergen_notice: e.target.value || null })} />
+              </Col>
+              <Col span={12}>
+                <Space>
+                  <span style={{ color: "#555" }}>店招 logo</span>
+                  <Select
+                    style={{ width: 170 }}
+                    value={form.shop.logo_object_key ?? ""}
+                    onChange={(v) => updShop({ logo_object_key: v || null })}
+                    options={[{ value: "", label: "无" }, ...images.map((im) => ({ value: im.object_key as string, label: im.object_key!.split("/").pop() }))]}
+                  />
+                </Space>
+              </Col>
+              <Col span={12}>
+                <Space>
+                  <span style={{ color: "#555" }}>主视觉图</span>
+                  <Select
+                    style={{ width: 170 }}
+                    value={form.shop.hero_object_key ?? ""}
+                    onChange={(v) => updShop({ hero_object_key: v || null })}
+                    options={[{ value: "", label: "无" }, ...images.map((im) => ({ value: im.object_key as string, label: im.object_key!.split("/").pop() }))]}
+                  />
+                </Space>
               </Col>
             </Row>
           </Card>

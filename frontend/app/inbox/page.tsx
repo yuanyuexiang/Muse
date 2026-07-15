@@ -7,28 +7,38 @@ import type { ColumnsType } from "antd/es/table";
 import { api } from "@/lib/api";
 import type { Customer, InboxMessage, InboxPage } from "@/lib/types";
 
-const PAGE = 20;
+const PAGE_OPTIONS = [20, 50, 100, 200];
 
 export default function InboxPage() {
   const router = useRouter();
   const [rows, setRows] = useState<InboxMessage[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<number[]>([]);
+  const [forwardedBy, setForwardedBy] = useState<string | undefined>();
+  const [forwarders, setForwarders] = useState<string[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customerId, setCustomerId] = useState<number | undefined>();
   const [newName, setNewName] = useState("");
   const [editing, setEditing] = useState<InboxMessage | null>(null);
   const [draft, setDraft] = useState("");
 
-  async function load(p = page) {
+  function qs(fb = forwardedBy, extra: Record<string, string> = {}) {
+    const q = new URLSearchParams({ status: "new", ...extra });
+    if (fb) q.set("forwarded_by", fb);
+    return q.toString();
+  }
+
+  async function load(p = page, ps = pageSize, fb = forwardedBy) {
     setLoading(true);
     try {
-      const d = await api<InboxPage>(`/inbox?limit=${PAGE}&offset=${(p - 1) * PAGE}`);
+      const d = await api<InboxPage>(`/inbox?${qs(fb, { limit: String(ps), offset: String((p - 1) * ps) })}`);
       setRows(d.items);
       setTotal(d.total);
       setPage(p);
+      setPageSize(ps);
     } catch (e) {
       message.error(String(e instanceof Error ? e.message : e));
     }
@@ -41,10 +51,36 @@ export default function InboxPage() {
       /* ignore */
     }
   }
+  async function loadForwarders() {
+    try {
+      setForwarders(await api<string[]>("/inbox/forwarders"));
+    } catch {
+      /* ignore */
+    }
+  }
   useEffect(() => {
     load(1);
     loadCustomers();
+    loadForwarders();
   }, []);
+
+  // 切换转发人筛选：清空跨页选择（避免把不同客服/客户的消息误并成一批），重载第一页。
+  function changeForwarder(fb: string | undefined) {
+    setForwardedBy(fb);
+    setSelected([]);
+    load(1, pageSize, fb);
+  }
+
+  // 全选「当前筛选下的全部未整理」——向后端取全量 id，一次跨页选中。
+  async function selectAllPending() {
+    try {
+      const ids = await api<number[]>(`/inbox/ids?${qs()}`);
+      setSelected(ids);
+      message.success(`已选中全部 ${ids.length} 条`);
+    } catch (e) {
+      message.error(String(e instanceof Error ? e.message : e));
+    }
+  }
 
   async function createCustomer() {
     if (!newName.trim()) return;
@@ -61,6 +97,7 @@ export default function InboxPage() {
     await api(`/inbox/${id}`, { method: "PATCH", body: JSON.stringify({ status: "discarded" }) });
     setSelected((s) => s.filter((x) => x !== id));
     load(page);
+    loadForwarders();
   }
   async function submit() {
     if (!customerId || selected.length === 0) return;
@@ -159,8 +196,31 @@ export default function InboxPage() {
         </Button>
         <Button onClick={() => load(page)}>刷新</Button>
       </Space>
+
+      <Space style={{ marginBottom: 10 }} wrap>
+        <span>按转发人筛选：</span>
+        <Select
+          allowClear
+          showSearch
+          placeholder="全部转发人"
+          style={{ width: 200 }}
+          value={forwardedBy}
+          onChange={changeForwarder}
+          options={forwarders.map((f) => ({ value: f, label: f }))}
+        />
+        <Button onClick={selectAllPending}>全选全部未整理（{total} 条）</Button>
+        {selected.length > 0 && (
+          <span style={{ color: "#1e5b3e" }}>
+            已选 <b>{selected.length}</b> 条（跨页）
+            <a style={{ marginLeft: 8 }} onClick={() => setSelected([])}>
+              清空
+            </a>
+          </span>
+        )}
+      </Space>
+
       <div style={{ color: "#888", marginBottom: 10, fontSize: 13 }}>
-        ① 选 / 建客户　② 勾选要整理的消息　③ 提交 → 自动进入菜单审校
+        ① 选 / 建客户　② 勾选要整理的消息（可按转发人筛选后「全选全部」，或调大每页条数一次全选本页）　③ 提交 → 自动进入菜单审校
       </div>
       <Table
         rowKey="id"
@@ -168,8 +228,25 @@ export default function InboxPage() {
         loading={loading}
         columns={columns}
         dataSource={rows}
-        rowSelection={{ selectedRowKeys: selected, onChange: (k) => setSelected(k as number[]) }}
-        pagination={{ current: page, pageSize: PAGE, total, onChange: (p) => load(p), showSizeChanger: false }}
+        rowSelection={{
+          selectedRowKeys: selected,
+          onChange: (k) => setSelected(k as number[]),
+          selections: [
+            Table.SELECTION_ALL,
+            Table.SELECTION_INVERT,
+            Table.SELECTION_NONE,
+            { key: "all-pending", text: `全选全部未整理（${total} 条）`, onSelect: selectAllPending },
+          ],
+        }}
+        pagination={{
+          current: page,
+          pageSize,
+          total,
+          showSizeChanger: true,
+          pageSizeOptions: PAGE_OPTIONS,
+          showTotal: (t) => `共 ${t} 条`,
+          onChange: (p, ps) => load(p, ps),
+        }}
       />
       <Modal open={!!editing} title="编辑内容" onCancel={() => setEditing(null)} onOk={saveEdit} okText="保存">
         {editing && editing.type !== "text" && <div style={{ marginBottom: 8 }}>{content(editing)}</div>}

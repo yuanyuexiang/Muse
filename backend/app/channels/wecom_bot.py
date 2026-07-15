@@ -78,8 +78,20 @@ def build_client() -> WSClient:
         raise RuntimeError("WECOM_BOT_ID / WECOM_BOT_SECRET 未配置（见 .env）")
 
     client = WSClient(
-        WSClientOptions(bot_id=settings.wecom_bot_id, secret=settings.wecom_bot_secret)
+        WSClientOptions(
+            bot_id=settings.wecom_bot_id,
+            secret=settings.wecom_bot_secret,
+            max_reconnect_attempts=-1,  # 无限重连，永不放弃
+            reconnect_interval=2000,
+        )
     )
+
+    # 关键：必须注册 "error" 监听。SDK 掉线时 emit("error", ...)，若无监听 pyee 会把异常
+    # 重新抛出，打断重连任务 → 机器人变僵尸（进程在但不再连）。这里吃掉并记日志即可。
+    def _on_ws_error(err):  # noqa: ANN001
+        log.warning("ws error (自动重连继续): %r", err)
+
+    client.on("error", _on_ws_error)
 
     @client.on("message.text")
     @_safe

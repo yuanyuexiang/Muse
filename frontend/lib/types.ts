@@ -60,12 +60,22 @@ export interface ShopInfo {
   promotions: string[];
   allergen_notice: string | null;
   style_notes: string | null;
+  logo_object_key: string | null;
+  hero_object_key: string | null;
+}
+
+export interface PageSpec {
+  preset: string;
+  width_mm: number | null;
+  height_mm: number | null;
+  bleed_mm: number;
 }
 
 export interface MenuSpec {
   shop: ShopInfo;
   categories: MenuCategory[];
   set_meals: SetMeal[];
+  page: PageSpec;
   theme: string;
   notes: string | null;
   missing_fields: string[];

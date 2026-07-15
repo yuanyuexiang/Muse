@@ -10,23 +10,32 @@ from app.services import run_extraction
 router = APIRouter(prefix="/inbox", tags=["inbox"])
 
 
+def _inbox_conds(status: str, forwarded_by: str | None):
+    """收件箱通用过滤条件：状态 + 可选转发人。列表 / ids / 计数三处共用。"""
+    conds = [models.InboxMessage.status == status]
+    if forwarded_by:
+        conds.append(models.InboxMessage.forwarded_by == forwarded_by)
+    return conds
+
+
 @router.get("", response_model=InboxPage)
 async def list_inbox(
     status: str = models.MSG_NEW,
+    forwarded_by: str | None = None,
     limit: int = 50,
     offset: int = 0,
     session: AsyncSession = Depends(get_session),
 ):
-    """待整理收件箱：默认列出未处理（new）的消息，分页返回。"""
+    """待整理收件箱：默认列出未处理（new）的消息，可按转发人过滤，分页返回。"""
     limit = max(1, min(limit, 200))
     offset = max(0, offset)
-    where = models.InboxMessage.status == status
+    conds = _inbox_conds(status, forwarded_by)
     total = await session.scalar(
-        select(func.count()).select_from(models.InboxMessage).where(where)
+        select(func.count()).select_from(models.InboxMessage).where(*conds)
     )
     rows = await session.scalars(
         select(models.InboxMessage)
-        .where(where)
+        .where(*conds)
         .order_by(models.InboxMessage.seq, models.InboxMessage.id)
         .limit(limit)
         .offset(offset)
@@ -37,6 +46,39 @@ async def list_inbox(
         limit=limit,
         offset=offset,
     )
+
+
+@router.get("/ids", response_model=list[int])
+async def list_inbox_ids(
+    status: str = models.MSG_NEW,
+    forwarded_by: str | None = None,
+    session: AsyncSession = Depends(get_session),
+):
+    """当前筛选下的全部消息 id（不分页），供前端「全选全部」一次拿全，跨页选中。"""
+    conds = _inbox_conds(status, forwarded_by)
+    rows = await session.scalars(
+        select(models.InboxMessage.id)
+        .where(*conds)
+        .order_by(models.InboxMessage.seq, models.InboxMessage.id)
+    )
+    return list(rows)
+
+
+@router.get("/forwarders", response_model=list[str])
+async def list_forwarders(
+    status: str = models.MSG_NEW,
+    session: AsyncSession = Depends(get_session),
+):
+    """当前状态下去重的转发人（客服 userid）列表，供筛选下拉。"""
+    rows = await session.scalars(
+        select(models.InboxMessage.forwarded_by)
+        .where(
+            models.InboxMessage.status == status,
+            models.InboxMessage.forwarded_by.is_not(None),
+        )
+        .distinct()
+    )
+    return [r for r in rows if r]
 
 
 @router.patch("/{message_id}", response_model=InboxMessageOut)

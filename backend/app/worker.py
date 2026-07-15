@@ -18,13 +18,31 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 log = logging.getLogger("muse.worker")
 
 
+CHECK_INTERVAL = 20        # 秒：健康检查间隔
+DOWN_LIMIT = 9             # 连续掉线次数上限（≈3 分钟）后退出让 Docker 重启
+
+
 async def _amain() -> None:
     await init_db()  # 与 API 共用一套表；单独跑也能建
     client = build_client()
     log.info("connecting to WeCom smart-robot long connection ...")
     await client.connect()
-    log.info("connected. waiting for forwarded messages (Ctrl-C to stop).")
-    await asyncio.Event().wait()
+    log.info("connected. supervising (check every %ds).", CHECK_INTERVAL)
+
+    # 看门狗：SDK 已负责心跳+无限重连，但若其内部重连任务彻底卡死（曾见连接挂起数十分钟），
+    # 进程会变僵尸（在跑但不连不听）。这里连续掉线超过阈值就退出，交给 Docker
+    # `restart: unless-stopped` 拉起全新进程（全新连接最可靠）。
+    down = 0
+    while True:
+        await asyncio.sleep(CHECK_INTERVAL)
+        if getattr(client, "is_connected", True):
+            down = 0
+            continue
+        down += 1
+        log.warning("long connection down (%d/%d)", down, DOWN_LIMIT)
+        if down >= DOWN_LIMIT:
+            log.error("down too long; exiting so Docker restarts a fresh process.")
+            return
 
 
 def main() -> None:

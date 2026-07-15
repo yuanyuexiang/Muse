@@ -1,0 +1,109 @@
+{% set FLAG = {'hot': '辣', 'vegetarian': '素', 'nut': '坚'} %}
+<!DOCTYPE html><html lang="zh"><head><meta charset="utf-8"><style>
+  @page {
+    size: {{ page.size }};
+    margin: 7mm 9mm 7mm 7mm;
+    {% if page.bleed %}bleed: {{ page.bleed }}mm; marks: crop;{% endif %}
+  }
+  :root { --brand:#1e5b3e; --accent:#b8860b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Noto Sans CJK SC","PingFang SC","DejaVu Sans",sans-serif; color:#1f2a24; font-size:9.5px; line-height:1.3; }
+
+  /* 右侧竖排书脊（每页重复） */
+  .spine { position:fixed; top:0; bottom:0; right:0; width:6mm; writing-mode:vertical-rl; text-orientation:mixed;
+           display:flex; align-items:center; justify-content:center; font-size:7px; letter-spacing:1px; color:var(--accent); background:#fbf7ea; border-left:1px solid #eee; }
+  .wrap { padding-right:7mm; }
+
+  /* 品牌带 */
+  .brand-band { display:flex; align-items:center; gap:14px; border-bottom:3px solid var(--brand); padding-bottom:6px; margin-bottom:6px; }
+  .bb-left { flex:0 0 auto; text-align:center; }
+  .logo-img { max-height:64px; max-width:210px; }
+  .brand-name { font-family:"Noto Serif CJK SC","Songti SC","DejaVu Serif",serif; font-size:30px; font-weight:700; letter-spacing:1px; color:var(--brand); line-height:1; }
+  .tagline { color:var(--accent); font-style:italic; font-size:11px; margin-top:2px; }
+  .bb-hero { flex:1; text-align:center; }
+  .bb-hero img { max-height:82px; border-radius:6px; }
+  .bb-right { flex:0 0 auto; display:flex; align-items:center; gap:10px; }
+  .contact { text-align:right; font-size:9px; color:#333; }
+  .phone { font-family:"Noto Serif CJK SC",serif; font-weight:700; font-size:19px; color:#fff; background:var(--brand); border-radius:5px; padding:3px 12px; white-space:nowrap; display:inline-block; margin-bottom:3px; }
+  .addr { max-width:220px; }
+  .qr { text-align:center; } .qr img { width:66px; height:66px; } .qr div { font-size:7px; color:#666; }
+
+  /* 信息条 */
+  .info-strip { display:flex; gap:6px; margin-bottom:6px; }
+  .info-box { flex:1; border:1px solid #d7e5dc; background:#f5f9f6; border-radius:4px; padding:4px 7px; font-size:8.5px; }
+  .info-box h4 { margin:0 0 2px; font-size:9px; color:var(--brand); border-bottom:1px solid #e0ebe4; padding-bottom:1px; }
+  .info-box.promo { border-color:#eecf8a; background:#fdf7ea; } .info-box.promo h4 { color:var(--accent); border-color:#f0dfb0; }
+  .info-box .line { line-height:1.4; }
+
+  /* 照片网格 */
+  .gallery { display:grid; grid-template-columns:repeat(auto-fill, 62px); gap:4px; margin-bottom:6px; }
+  .gallery figure { margin:0; position:relative; }
+  .gallery img { width:62px; height:46px; object-fit:cover; border-radius:3px; border:1px solid #cfcfcf; display:block; }
+  .gallery figcaption { position:absolute; left:2px; bottom:2px; background:var(--brand); color:#fff; font-size:7px; font-weight:700; padding:0 3px; border-radius:2px; }
+
+  /* 菜品自动分栏 */
+  .dishes { column-width:{{ page.col_width }}mm; column-gap:5mm; }
+  .category { margin-bottom:4px; break-inside:avoid; }
+  .cat-title { background:var(--brand); color:#fff; font-weight:700; font-size:10px; padding:1px 6px; border-radius:3px; margin:0 0 2px; break-after:avoid; }
+  .item { break-inside:avoid; }
+  .dish { display:flex; align-items:baseline; gap:3px; }
+  .dnum { color:#8a8a8a; min-width:14px; font-variant-numeric:tabular-nums; }
+  .dname { font-weight:600; }
+  .leader { flex:1 1 auto; border-bottom:1px dotted #bcbcbc; position:relative; top:-3px; }
+  .dprice { font-weight:700; white-space:nowrap; color:var(--brand); }
+  .ddesc { color:#7a7a7a; font-size:8px; margin:0 0 1px 14px; }
+  .flag { display:inline-block; font-size:7px; padding:0 3px; border-radius:3px; margin-left:2px; color:#fff; }
+  .flag-hot{background:#c0392b}.flag-vegetarian{background:#2e8b57}.flag-nut{background:#8a5a2b}
+
+  .setmeals { break-inside:avoid; margin-top:4px; border:1.5px solid var(--accent); border-radius:5px; padding:6px 8px; background:#fffdf7; }
+  .setmeals h3 { margin:0 0 4px; color:var(--accent); font-family:"Noto Serif CJK SC",serif; text-align:center; font-size:13px; }
+  .setmeal .sm-head { display:flex; justify-content:space-between; font-weight:700; }
+  .setmeal .sm-items { color:#666; font-size:8px; margin-bottom:3px; }
+
+  .footer { margin-top:6px; border-top:1.5px solid var(--brand); padding-top:4px; display:flex; justify-content:space-between; font-size:8px; color:#555; }
+</style></head><body>
+
+  {% set spine = [spec.shop.address, ('Tel: ' ~ spec.shop.phone) if spec.shop.phone else ''] | select | join('　·　') %}
+  {% if spine %}<div class="spine">{{ spine }}</div>{% endif %}
+
+  <div class="wrap">
+    <div class="brand-band">
+      <div class="bb-left">
+        {% if logo_url %}<img class="logo-img" src="{{ logo_url }}" alt="">{% else %}<div class="brand-name">{{ spec.shop.name or "餐厅名称" }}</div>{% endif %}
+        {% if spec.shop.tagline %}<div class="tagline">{{ spec.shop.tagline }}</div>{% endif %}
+      </div>
+      {% if hero_url %}<div class="bb-hero"><img src="{{ hero_url }}" alt=""></div>{% endif %}
+      <div class="bb-right">
+        <div class="contact">
+          {% if spec.shop.phone %}<div class="phone">{{ spec.shop.phone }}</div>{% endif %}
+          {% if spec.shop.address %}<div class="addr">{{ spec.shop.address }}</div>{% endif %}
+          {% if spec.shop.online_order_url %}<div>{{ spec.shop.online_order_url }}</div>{% endif %}
+        </div>
+        {% if qr_url %}<div class="qr"><img src="{{ qr_url }}" alt=""><div>扫码点餐</div></div>{% endif %}
+      </div>
+    </div>
+
+    <div class="info-strip">
+      {% if spec.shop.opening_hours %}<div class="info-box"><h4>营业时间</h4>{% for l in spec.shop.opening_hours | select %}<div class="line">{{ l }}</div>{% endfor %}</div>{% endif %}
+      {% if spec.shop.delivery_terms %}<div class="info-box"><h4>外送服务</h4>{% for l in spec.shop.delivery_terms | select %}<div class="line">{{ l }}</div>{% endfor %}</div>{% endif %}
+      {% if spec.shop.promotions %}<div class="info-box promo"><h4>优惠</h4>{% for l in spec.shop.promotions | select %}<div class="line">★ {{ l }}</div>{% endfor %}</div>{% endif %}
+      {% if spec.shop.allergen_notice %}<div class="info-box"><h4>过敏原提示</h4><div class="line">{{ spec.shop.allergen_notice }}</div></div>{% endif %}
+    </div>
+
+    {% if photos %}<div class="gallery">{% for ph in photos %}<figure><img src="{{ ph.url }}" alt="">{% if ph.number %}<figcaption>{{ ph.number }}</figcaption>{% endif %}</figure>{% endfor %}</div>{% endif %}
+
+    <div class="dishes">
+      {% for cat in spec.categories %}<div class="category"><div class="cat-title">{{ cat.name }}</div>
+        {% for d in cat.dishes %}<div class="item"><div class="dish">{% if d.number %}<span class="dnum">{{ d.number }}</span>{% endif %}<span class="dname">{{ d.name }}{% for f in d.flags %}<span class="flag flag-{{ f }}">{{ FLAG.get(f) or f[:1]|upper }}</span>{% endfor %}</span><span class="leader"></span>{% if d.price %}<span class="dprice">{{ d.price }}</span>{% endif %}</div>{% if d.description %}<div class="ddesc">{{ d.description }}</div>{% endif %}</div>{% endfor %}
+      </div>{% endfor %}
+
+      {% if spec.set_meals %}<div class="setmeals"><h3>套餐 · Set Meals</h3>{% for sm in spec.set_meals %}<div class="setmeal"><div class="sm-head"><span>{{ sm.name }}</span><span>{{ sm.price }}</span></div>{% if sm.items %}<div class="sm-items">{{ sm.items | join(" · ") }}</div>{% endif %}</div>{% endfor %}</div>{% endif %}
+    </div>
+
+    <div class="footer">
+      <div><span class="flag flag-hot">辣</span> 辣　<span class="flag flag-vegetarian">素</span> 素食　<span class="flag flag-nut">坚</span> 含坚果</div>
+      <div>{{ spec.shop.name }}{% if spec.shop.phone %} · {{ spec.shop.phone }}{% endif %}</div>
+    </div>
+  </div>
+
+</body></html>
